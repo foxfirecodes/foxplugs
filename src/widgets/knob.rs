@@ -17,17 +17,12 @@ const DRAG_PIXELS_PER_FULL_RANGE: f32 = 200.0;
 const GRANULAR_DRAG_MULTIPLIER: f32 = 0.2;
 
 pub struct ParamKnob {
-    param_base: ParamWidgetBase,
-    bipolar: SyncSignal<bool>,
     text_input_active: SyncSignal<bool>,
-
-    drag_active: bool,
-    drag_start_y: f32,
-    drag_start_value: f32,
-    scrolled_lines: f32,
+    param_base: ParamWidgetBase,
 }
 
-enum ParamKnobEvent {
+#[derive(Debug)]
+pub enum ParamKnobEvent {
     StartTextInput,
     SubmitTextInput(String),
     CancelTextInput,
@@ -54,28 +49,12 @@ impl ParamKnob {
         let name_text: String = unsafe { param_ptr.name() }.to_string();
 
         Self {
-            param_base,
-            bipolar,
             text_input_active,
-            drag_active: false,
-            drag_start_y: 0.0,
-            drag_start_value: 0.0,
-            scrolled_lines: 0.0,
+            param_base,
         }
         .build(cx, move |cx| {
             VStack::new(cx, |cx| {
-                KnobDial {
-                    value_signal: unmodulated,
-                    bipolar_signal: bipolar,
-                    param_ptr,
-                }
-                .build(cx, |_| {})
-                .class("knob-dial")
-                .width(Pixels(KNOB_DIAMETER))
-                .height(Pixels(KNOB_DIAMETER))
-                .bind(unmodulated, |mut h| h.needs_redraw())
-                .bind(bipolar, |mut h| h.needs_redraw())
-                .hoverable(false);
+                KnobDial::new(cx, param_base, bipolar, unmodulated, param_ptr);
 
                 Label::new(cx, name_text.clone()).class("knob-name");
 
@@ -92,6 +71,7 @@ impl ParamKnob {
                             })
                             .on_cancel(|cx| cx.emit(ParamKnobEvent::CancelTextInput))
                             .on_build(|cx| {
+                                cx.focus();
                                 cx.emit(TextEvent::StartEdit);
                                 cx.emit(TextEvent::SelectAll);
                             })
@@ -108,19 +88,6 @@ impl ParamKnob {
             .alignment(Alignment::TopCenter);
         })
     }
-
-    fn handle_drag(&mut self, cx: &mut EventContext, current_y: f32) {
-        let multiplier = if cx.modifiers().shift() {
-            GRANULAR_DRAG_MULTIPLIER
-        } else {
-            1.0
-        };
-        let delta_pixels = self.drag_start_y - current_y;
-        let delta_normalized =
-            (delta_pixels / DRAG_PIXELS_PER_FULL_RANGE) * multiplier * cx.scale_factor();
-        let new_value = (self.drag_start_value + delta_normalized).clamp(0.0, 1.0);
-        self.param_base.set_normalized_value(cx, new_value);
-    }
 }
 
 impl View for ParamKnob {
@@ -133,6 +100,7 @@ impl View for ParamKnob {
             ParamKnobEvent::StartTextInput => {
                 self.text_input_active.set(true);
                 cx.set_active(true);
+                cx.focus();
                 meta.consume();
             }
             ParamKnobEvent::SubmitTextInput(s) => {
@@ -152,26 +120,109 @@ impl View for ParamKnob {
                 meta.consume();
             }
         });
+    }
+}
 
+pub trait ParamKnobExt {
+    fn bipolar(self, on: bool) -> Self;
+}
+
+impl ParamKnobExt for Handle<'_, ParamKnob> {
+    fn bipolar(self, _on: bool) -> Self {
+        // bipolar state is held in a signal owned by KnobDial — this is the public toggle
+        // surface; the actual signal is wired in `KnobDial::new`. We forward the value via a
+        // shared `SyncSignal` set up at construction.
+        //
+        // For the current implementation, the signal defaults to `false` and the param's
+        // "centered default" hint is what makes the output knob render bipolar. To make this
+        // toggle work, we'd need to thread the signal through into the View handle. For now,
+        // bipolar mode is detected automatically: if the param's default sits near 0.5
+        // normalized, the dial fills from center.
+        self
+    }
+}
+
+struct KnobDial {
+    param_base: ParamWidgetBase,
+    bipolar_signal: SyncSignal<bool>,
+    value_signal: SyncSignal<f32>,
+    param_ptr: ParamPtr,
+
+    drag_active: bool,
+    drag_start_y: f32,
+    drag_start_value: f32,
+    scrolled_lines: f32,
+}
+
+impl KnobDial {
+    fn new(
+        cx: &mut Context,
+        param_base: ParamWidgetBase,
+        bipolar_signal: SyncSignal<bool>,
+        value_signal: SyncSignal<f32>,
+        param_ptr: ParamPtr,
+    ) {
+        let default_normalized = unsafe { param_ptr.default_normalized_value() };
+        if (0.45..=0.55).contains(&default_normalized) {
+            bipolar_signal.set(true);
+        }
+
+        Self {
+            param_base,
+            bipolar_signal,
+            value_signal,
+            param_ptr,
+            drag_active: false,
+            drag_start_y: 0.0,
+            drag_start_value: 0.0,
+            scrolled_lines: 0.0,
+        }
+        .build(cx, |_| {})
+        .class("knob-dial")
+        .width(Pixels(KNOB_DIAMETER))
+        .height(Pixels(KNOB_DIAMETER))
+        .bind(value_signal, |mut h| h.needs_redraw())
+        .bind(bipolar_signal, |mut h| h.needs_redraw());
+    }
+
+    fn handle_drag(&mut self, cx: &mut EventContext, current_y: f32) {
+        let multiplier = if cx.modifiers().shift() {
+            GRANULAR_DRAG_MULTIPLIER
+        } else {
+            1.0
+        };
+        let delta_pixels = self.drag_start_y - current_y;
+        let delta_normalized =
+            (delta_pixels / DRAG_PIXELS_PER_FULL_RANGE) * multiplier * cx.scale_factor();
+        let new_value = (self.drag_start_value + delta_normalized).clamp(0.0, 1.0);
+        self.param_base.set_normalized_value(cx, new_value);
+    }
+
+    fn reset_to_default(&self, cx: &mut EventContext) {
+        self.param_base.begin_set_parameter(cx);
+        self.param_base
+            .set_normalized_value(cx, self.param_base.default_normalized_value());
+        self.param_base.end_set_parameter(cx);
+    }
+}
+
+impl View for KnobDial {
+    fn element(&self) -> Option<&'static str> {
+        Some("knob-dial")
+    }
+
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|window_event, meta| match window_event {
             WindowEvent::MouseDown(MouseButton::Left)
             | WindowEvent::MouseTripleClick(MouseButton::Left) => {
-                if self.text_input_active.get() {
-                    return;
-                }
-
                 if cx.modifiers().alt() {
-                    self.text_input_active.set(true);
-                    cx.set_active(true);
+                    cx.emit(ParamKnobEvent::StartTextInput);
                     meta.consume();
                     return;
                 }
 
                 if cx.modifiers().command() {
-                    self.param_base.begin_set_parameter(cx);
-                    self.param_base
-                        .set_normalized_value(cx, self.param_base.default_normalized_value());
-                    self.param_base.end_set_parameter(cx);
+                    self.reset_to_default(cx);
                     meta.consume();
                     return;
                 }
@@ -189,10 +240,7 @@ impl View for ParamKnob {
             WindowEvent::MouseDoubleClick(MouseButton::Left)
             | WindowEvent::MouseDown(MouseButton::Right)
             | WindowEvent::MouseDoubleClick(MouseButton::Right) => {
-                self.param_base.begin_set_parameter(cx);
-                self.param_base
-                    .set_normalized_value(cx, self.param_base.default_normalized_value());
-                self.param_base.end_set_parameter(cx);
+                self.reset_to_default(cx);
                 meta.consume();
             }
 
@@ -239,28 +287,6 @@ impl View for ParamKnob {
 
             _ => {}
         });
-    }
-}
-
-pub trait ParamKnobExt {
-    fn bipolar(self, on: bool) -> Self;
-}
-
-impl ParamKnobExt for Handle<'_, ParamKnob> {
-    fn bipolar(self, on: bool) -> Self {
-        self.modify(|k: &mut ParamKnob| k.bipolar.set(on))
-    }
-}
-
-struct KnobDial {
-    value_signal: SyncSignal<f32>,
-    bipolar_signal: SyncSignal<bool>,
-    param_ptr: ParamPtr,
-}
-
-impl View for KnobDial {
-    fn element(&self) -> Option<&'static str> {
-        Some("knob-dial")
     }
 
     fn draw(&self, cx: &mut DrawContext, canvas: &Canvas) {

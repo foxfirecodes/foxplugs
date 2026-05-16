@@ -49,13 +49,13 @@ impl Default for FoxcrushParams {
                 "Bit Depth",
                 16.0,
                 FloatRange::Linear {
-                    min: 1.0,
+                    min: 2.0,
                     max: 16.0,
                 },
             )
             .with_smoother(SmoothingStyle::Linear(20.0))
-            .with_unit(" bits")
-            .with_value_to_string(formatters::v2s_f32_rounded(2)),
+            .with_step_size(0.5)
+            .with_unit(" bits"),
 
             downsample: FloatParam::new(
                 "Downsample",
@@ -63,12 +63,12 @@ impl Default for FoxcrushParams {
                 FloatRange::Skewed {
                     min: 1.0,
                     max: 50.0,
-                    factor: FloatRange::skew_factor(-2.0),
+                    factor: FloatRange::skew_factor(-1.0),
                 },
             )
             .with_smoother(SmoothingStyle::Linear(20.0))
-            .with_unit("x")
-            .with_value_to_string(formatters::v2s_f32_rounded(2)),
+            .with_step_size(1.0)
+            .with_unit("x"),
 
             mix: FloatParam::new(
                 "Mix",
@@ -76,6 +76,7 @@ impl Default for FoxcrushParams {
                 FloatRange::Linear { min: 0.0, max: 1.0 },
             )
             .with_smoother(SmoothingStyle::Linear(20.0))
+            .with_step_size(0.01)
             .with_unit("%")
             .with_value_to_string(formatters::v2s_f32_percentage(0))
             .with_string_to_value(formatters::s2v_f32_percentage()),
@@ -90,6 +91,7 @@ impl Default for FoxcrushParams {
                 },
             )
             .with_smoother(SmoothingStyle::Logarithmic(50.0))
+            .with_step_size(0.05)
             .with_unit(" dB")
             .with_value_to_string(formatters::v2s_f32_gain_to_db(2))
             .with_string_to_value(formatters::s2v_f32_gain_to_db()),
