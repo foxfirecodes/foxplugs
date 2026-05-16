@@ -24,8 +24,8 @@ A bitcrusher audio effect plugin, inspired by Ableton Live's Redux.
 | Layer | Choice | Rationale |
 |---|---|---|
 | Language | **Rust** | Memory safety in real-time audio code; avoids C/C++ as a hard requirement. |
-| Plugin framework | **[nih-plug](https://github.com/robbert-vdh/nih-plug)** | Rust-native, exports VST3 + CLAP from one codebase, active maintenance, real shipping plugins as references (Diopser, Spectral Compressor). |
-| GUI library | **[Vizia](https://github.com/vizia/vizia)** via `nih_plug_vizia` | Declarative, CSS-style stylesheets for theming and `:hover` states, retained-mode with an animation system, proven precedent for audio plugin UIs. |
+| Plugin framework | **[nih-plug](https://codeberg.org/BillyDM/nih-plug)** (BillyDM fork) | The original `robbert-vdh/nih-plug` is no longer maintained; BillyDM's hard fork on Codeberg is the active line. Rust-native, exports VST3 + CLAP from one codebase, real shipping plugins as references (Diopser, Spectral Compressor). |
+| GUI library | **[vizia-plug](https://github.com/vizia/vizia-plug)** (replaces `nih_plug_vizia`) | The dedicated Vizia adapter for nih-plug, maintained by the Vizia team. Declarative, CSS-style stylesheets for theming and `:hover` states, retained-mode with an animation system, proven precedent for audio plugin UIs. |
 | Windowing | **[baseview](https://github.com/RustAudio/baseview)** (via nih-plug + Vizia) | Cross-platform plugin windowing; surfaces file drag-into-plugin events natively. |
 | Bundling | **`cargo xtask bundle`** (nih-plug convention) | Cargo cannot produce `.vst3` / `.clap` bundle directories directly; the `xtask` script handles platform-specific bundle layout. |
 | Standalone host | **`nih_export_standalone!`** macro | Builds a JACK-backed CLI binary for testing without a DAW. On Linux + PipeWire, audio is routed in via `qjackctl`, `Carla`, or `pw-link`. |
@@ -110,7 +110,7 @@ A bitcrusher audio effect plugin, inspired by Ableton Live's Redux.
 | Format | Status | Notes |
 |---|---|---|
 | **CLAP** | Primary target | MIT-licensed, modern, supported by Bitwig, Reaper, FL, Studio One 7+, Live 12+. |
-| **VST3** | Secondary target | nih-plug's VST3 export is GPLv3, which aligns with the project license. |
+| **VST3** | Secondary target | The nih-plug framework itself is ISC-licensed, but its VST3 export uses `vst3-sys` bindings which are GPLv3. Any VST3 plugin built with nih-plug must therefore be GPLv3-compatible — which aligns with foxcrush's chosen license. |
 | LV2 | Not supported | Out of scope. |
 | AU | Not supported | Out of scope. |
 
@@ -124,4 +124,4 @@ A bitcrusher audio effect plugin, inspired by Ableton Live's Redux.
 
 ## License
 
-GPLv3, consistent with nih-plug's VST3 dependency licensing.
+GPLv3, consistent with the GPLv3-licensed `vst3-sys` bindings used by nih-plug's VST3 export. The nih-plug framework itself is ISC; vizia-plug is MIT; the GPLv3 obligation propagates only through the VST3 build path.
