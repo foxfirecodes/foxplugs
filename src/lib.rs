@@ -4,6 +4,7 @@ use vizia_plug::ViziaState;
 
 mod dsp;
 mod editor;
+mod widgets;
 
 use dsp::BitcrushChannelState;
 

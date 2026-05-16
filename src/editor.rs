@@ -1,13 +1,81 @@
 use nih_plug::prelude::Editor;
 use std::sync::Arc;
 use vizia_plug::vizia::prelude::*;
-use vizia_plug::widgets::*;
 use vizia_plug::{create_vizia_editor, ViziaState, ViziaTheming};
 
+use crate::widgets::{ParamKnob, ParamKnobExt};
 use crate::FoxcrushParams;
 
+const STYLESHEET: &str = r#"
+* {
+    background-color: #0d0c14;
+    color: #d8d6e2;
+    font-size: 13;
+}
+
+label {
+    background-color: transparent;
+    color: #d8d6e2;
+}
+
+label.title {
+    font-size: 26;
+    color: #b388ff;
+    height: 48px;
+    alignment: bottom-center;
+}
+
+vstack.knob-grid {
+    row-between: 14px;
+    child-space: 16px;
+    width: 1s;
+}
+
+hstack.knob-row {
+    col-between: 18px;
+    width: 1s;
+    alignment: center;
+}
+
+vstack.knob-cell {
+    width: 1s;
+    row-between: 6px;
+    alignment: top-center;
+}
+
+label.knob-name {
+    color: #6ea8fe;
+    font-size: 11;
+    alignment: center;
+}
+
+label.knob-value {
+    color: #d8d6e2;
+    font-size: 12;
+    alignment: center;
+}
+
+label.knob-value:hover {
+    color: #b388ff;
+}
+
+textbox.knob-value-input {
+    background-color: #1a1825;
+    color: #d8d6e2;
+    border-color: #b388ff;
+    border-width: 1px;
+    corner-radius: 3px;
+    padding: 2px 4px;
+    font-size: 12;
+}
+
+knob-dial {
+    background-color: transparent;
+}
+"#;
+
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (320, 360))
+    ViziaState::new(|| (340, 360))
 }
 
 pub(crate) fn create(
@@ -15,28 +83,34 @@ pub(crate) fn create(
     editor_state: Arc<ViziaState>,
 ) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
-        VStack::new(cx, |cx| {
-            Label::new(cx, "foxcrush")
-                .font_size(28.0)
-                .height(Pixels(50.0))
-                .alignment(Alignment::BottomCenter);
+        cx.add_stylesheet(STYLESHEET).ok();
 
-            labeled_slider(cx, "Bit Depth", &params.bit_depth);
-            labeled_slider(cx, "Downsample", &params.downsample);
-            labeled_slider(cx, "Mix", &params.mix);
-            labeled_slider(cx, "Output", &params.output_gain);
+        VStack::new(cx, |cx| {
+            Label::new(cx, "foxcrush").class("title");
+
+            VStack::new(cx, |cx| {
+                HStack::new(cx, |cx| {
+                    knob_cell(cx, &params.bit_depth, false);
+                    knob_cell(cx, &params.downsample, false);
+                })
+                .class("knob-row");
+
+                HStack::new(cx, |cx| {
+                    knob_cell(cx, &params.mix, false);
+                    knob_cell(cx, &params.output_gain, true);
+                })
+                .class("knob-row");
+            })
+            .class("knob-grid");
         })
         .alignment(Alignment::TopCenter);
     })
 }
 
-fn labeled_slider<P: nih_plug::params::Param + 'static>(
+fn knob_cell<P: nih_plug::params::Param + 'static>(
     cx: &mut Context,
-    name: &'static str,
     param: &P,
+    bipolar: bool,
 ) {
-    VStack::new(cx, |cx| {
-        Label::new(cx, name).top(Pixels(8.0));
-        ParamSlider::new(cx, param);
-    });
+    ParamKnob::new(cx, param).bipolar(bipolar);
 }
