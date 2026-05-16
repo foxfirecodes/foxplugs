@@ -17,6 +17,8 @@ A bitcrusher audio effect plugin, inspired by Ableton Live's Redux.
 - **Faithful emulation of Redux.** No effort is made to match Redux's exact frequency response, anti-aliasing behavior, or parameter curves. Foxcrush is its own effect that occupies the same sonic territory.
 - **Drag-and-drop of audio files out of the plugin to a DAW timeline.** This is a host-specific capability with no standard CLAP/VST3 mechanism, and the plugin has no use case for it.
 - **Built-in spectrum analyzer / waveform display** in the initial version. The architecture should not preclude adding one later, but the v1 UI is knobs only.
+- **Pre/post anti-aliasing filter** in v1. Redux has one for taming or emphasizing aliasing; foxcrush v1 omits it to keep scope minimal. Future enhancement.
+- **Custom rotary knob widgets** in v1. vizia-plug only ships `ParamSlider`, `ParamButton`, and `PeakMeter` out of the box; v1 uses sliders. Rotary knobs are future work and would be a custom widget atop vizia's drawing primitives.
 - **Preset management** beyond what host DAWs provide via the standard plugin parameter system.
 
 ## Tech stack
@@ -40,11 +42,10 @@ A bitcrusher audio effect plugin, inspired by Ableton Live's Redux.
 │  │   Plugin struct    │────▶│       Params struct         │   │
 │  │  (Plugin trait,    │     │  (#[derive(Params)])       │   │
 │  │   ClapPlugin,      │     │   bit depth, downsample,    │   │
-│  │   Vst3Plugin)      │     │   dry/wet, output gain,     │   │
-│  │                    │     │   pre/post filter mode      │   │
-│  │  - sample_rate     │     │                              │   │
+│  │   Vst3Plugin)      │     │   dry/wet, output gain      │   │
+│  │                    │     │                              │   │
 │  │  - dsp state       │     │  Smoothed where audible:    │   │
-│  │  - editor handle   │     │    Linear / Logarithmic     │   │
+│  │    (per channel)   │     │    Linear / Logarithmic     │   │
 │  └─────────┬──────────┘     └─────────────┬──────────────┘   │
 │            │                                │                  │
 │            │ process(buffer)                │ Arc<Params>       │
@@ -52,22 +53,21 @@ A bitcrusher audio effect plugin, inspired by Ableton Live's Redux.
 │  ┌────────────────────┐                    │                  │
 │  │    DSP module      │◀───────────────────┘                  │
 │  │                    │                                        │
-│  │  - sample/hold     │   read smoothed values per sample      │
+│  │  - sample/hold     │   read smoothed values per frame       │
 │  │    downsampler     │                                        │
 │  │  - mid-tread bit   │                                        │
 │  │    quantizer       │                                        │
-│  │  - optional        │                                        │
-│  │    pre/post filter │                                        │
-│  │  - dry/wet mix     │                                        │
+│  │  - dry/wet mix     │   (mix + output gain applied in        │
+│  │  - output gain     │    Plugin::process, not in dsp module) │
 │  └────────────────────┘                                        │
 │                                                                │
 │  ┌────────────────────────────────────────────────────────┐   │
 │  │                    Editor (Vizia)                       │   │
 │  │                                                          │   │
-│  │   - knob widgets bound to Params via lenses              │   │
-│  │   - stylesheet for theming + hover                       │   │
+│  │   - v1: ParamSlider widgets per parameter                │   │
 │  │   - reads Params (host-owned source of truth)            │   │
 │  │   - writes Params via parameter setter context           │   │
+│  │   - future: custom rotary knobs, stylesheet, animations  │   │
 │  └────────────────────────────────────────────────────────┘   │
 │                                                                │
 │  ┌────────────────────────────────────────────────────────┐   │

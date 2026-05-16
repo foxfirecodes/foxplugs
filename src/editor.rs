@@ -7,7 +7,7 @@ use vizia_plug::{create_vizia_editor, ViziaState, ViziaTheming};
 use crate::FoxcrushParams;
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (260, 200))
+    ViziaState::new(|| (320, 360))
 }
 
 pub(crate) fn create(
@@ -21,9 +21,22 @@ pub(crate) fn create(
                 .height(Pixels(50.0))
                 .alignment(Alignment::BottomCenter);
 
-            Label::new(cx, "Gain");
-            ParamSlider::new(cx, &params.gain);
+            labeled_slider(cx, "Bit Depth", &params.bit_depth);
+            labeled_slider(cx, "Downsample", &params.downsample);
+            labeled_slider(cx, "Mix", &params.mix);
+            labeled_slider(cx, "Output", &params.output_gain);
         })
         .alignment(Alignment::TopCenter);
     })
+}
+
+fn labeled_slider<P: nih_plug::params::Param + 'static>(
+    cx: &mut Context,
+    name: &'static str,
+    param: &P,
+) {
+    VStack::new(cx, |cx| {
+        Label::new(cx, name).top(Pixels(8.0));
+        ParamSlider::new(cx, param);
+    });
 }

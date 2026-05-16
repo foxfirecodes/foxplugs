@@ -2,10 +2,14 @@ use nih_plug::prelude::*;
 use std::sync::Arc;
 use vizia_plug::ViziaState;
 
+mod dsp;
 mod editor;
+
+use dsp::BitcrushChannelState;
 
 pub struct Foxcrush {
     params: Arc<FoxcrushParams>,
+    channel_states: Vec<BitcrushChannelState>,
 }
 
 #[derive(Params)]
@@ -13,14 +17,24 @@ pub struct FoxcrushParams {
     #[persist = "editor-state"]
     editor_state: Arc<ViziaState>,
 
-    #[id = "gain"]
-    pub gain: FloatParam,
+    #[id = "bit_depth"]
+    pub bit_depth: FloatParam,
+
+    #[id = "downsample"]
+    pub downsample: FloatParam,
+
+    #[id = "mix"]
+    pub mix: FloatParam,
+
+    #[id = "output_gain"]
+    pub output_gain: FloatParam,
 }
 
 impl Default for Foxcrush {
     fn default() -> Self {
         Self {
             params: Arc::new(FoxcrushParams::default()),
+            channel_states: Vec::new(),
         }
     }
 }
@@ -29,13 +43,49 @@ impl Default for FoxcrushParams {
     fn default() -> Self {
         Self {
             editor_state: editor::default_state(),
-            gain: FloatParam::new(
-                "Gain",
+
+            bit_depth: FloatParam::new(
+                "Bit Depth",
+                16.0,
+                FloatRange::Linear {
+                    min: 1.0,
+                    max: 16.0,
+                },
+            )
+            .with_smoother(SmoothingStyle::Linear(20.0))
+            .with_unit(" bits")
+            .with_value_to_string(formatters::v2s_f32_rounded(2)),
+
+            downsample: FloatParam::new(
+                "Downsample",
+                1.0,
+                FloatRange::Skewed {
+                    min: 1.0,
+                    max: 50.0,
+                    factor: FloatRange::skew_factor(-2.0),
+                },
+            )
+            .with_smoother(SmoothingStyle::Linear(20.0))
+            .with_unit("x")
+            .with_value_to_string(formatters::v2s_f32_rounded(2)),
+
+            mix: FloatParam::new(
+                "Mix",
+                1.0,
+                FloatRange::Linear { min: 0.0, max: 1.0 },
+            )
+            .with_smoother(SmoothingStyle::Linear(20.0))
+            .with_unit("%")
+            .with_value_to_string(formatters::v2s_f32_percentage(0))
+            .with_string_to_value(formatters::s2v_f32_percentage()),
+
+            output_gain: FloatParam::new(
+                "Output",
                 util::db_to_gain(0.0),
                 FloatRange::Skewed {
-                    min: util::db_to_gain(-30.0),
-                    max: util::db_to_gain(30.0),
-                    factor: FloatRange::gain_skew_factor(-30.0, 30.0),
+                    min: util::db_to_gain(-12.0),
+                    max: util::db_to_gain(12.0),
+                    factor: FloatRange::gain_skew_factor(-12.0, 12.0),
                 },
             )
             .with_smoother(SmoothingStyle::Logarithmic(50.0))
@@ -73,16 +123,47 @@ impl Plugin for Foxcrush {
         editor::create(self.params.clone(), self.params.editor_state.clone())
     }
 
+    fn initialize(
+        &mut self,
+        audio_io_layout: &AudioIOLayout,
+        _buffer_config: &BufferConfig,
+        _context: &mut impl InitContext<Self>,
+    ) -> bool {
+        let channels = audio_io_layout
+            .main_output_channels
+            .map(|n| n.get() as usize)
+            .unwrap_or(2);
+        self.channel_states = vec![BitcrushChannelState::default(); channels];
+        true
+    }
+
+    fn reset(&mut self) {
+        for state in &mut self.channel_states {
+            state.reset();
+        }
+    }
+
     fn process(
         &mut self,
         buffer: &mut Buffer,
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        for channel_samples in buffer.iter_samples() {
-            let gain = self.params.gain.smoothed.next();
-            for sample in channel_samples {
-                *sample *= gain;
+        for mut channel_samples in buffer.iter_samples() {
+            let bit_depth = self.params.bit_depth.smoothed.next();
+            let downsample = self.params.downsample.smoothed.next();
+            let mix = self.params.mix.smoothed.next();
+            let output_gain = self.params.output_gain.smoothed.next();
+
+            for (ch_idx, sample) in channel_samples.iter_mut().enumerate() {
+                let dry = *sample;
+                let crushed = dsp::process_sample(
+                    dry,
+                    bit_depth,
+                    downsample,
+                    &mut self.channel_states[ch_idx],
+                );
+                *sample = (dry * (1.0 - mix) + crushed * mix) * output_gain;
             }
         }
 
@@ -93,7 +174,7 @@ impl Plugin for Foxcrush {
 impl ClapPlugin for Foxcrush {
     const CLAP_ID: &'static str = "dev.foxfire.foxcrush";
     const CLAP_DESCRIPTION: Option<&'static str> =
-        Some("A bitcrusher audio effect plugin (placeholder gain stage)");
+        Some("A bitcrusher audio effect inspired by Ableton Redux");
     const CLAP_MANUAL_URL: Option<&'static str> = Some(Self::URL);
     const CLAP_SUPPORT_URL: Option<&'static str> = None;
     const CLAP_FEATURES: &'static [ClapFeature] = &[
