@@ -54,8 +54,8 @@ impl Default for FoxcrushParams {
                 },
             )
             .with_smoother(SmoothingStyle::Linear(20.0))
-            .with_step_size(0.5)
-            .with_unit(" bits"),
+            .with_unit(" bits")
+            .with_value_to_string(smart_rounded()),
 
             downsample: FloatParam::new(
                 "Downsample",
@@ -67,8 +67,8 @@ impl Default for FoxcrushParams {
                 },
             )
             .with_smoother(SmoothingStyle::Linear(20.0))
-            .with_step_size(1.0)
-            .with_unit("x"),
+            .with_unit("x")
+            .with_value_to_string(smart_rounded()),
 
             mix: FloatParam::new(
                 "Mix",
@@ -76,7 +76,6 @@ impl Default for FoxcrushParams {
                 FloatRange::Linear { min: 0.0, max: 1.0 },
             )
             .with_smoother(SmoothingStyle::Linear(20.0))
-            .with_step_size(0.01)
             .with_unit("%")
             .with_value_to_string(formatters::v2s_f32_percentage(0))
             .with_string_to_value(formatters::s2v_f32_percentage()),
@@ -91,7 +90,6 @@ impl Default for FoxcrushParams {
                 },
             )
             .with_smoother(SmoothingStyle::Logarithmic(50.0))
-            .with_step_size(0.05)
             .with_unit(" dB")
             .with_value_to_string(formatters::v2s_f32_gain_to_db(2))
             .with_string_to_value(formatters::s2v_f32_gain_to_db()),
@@ -191,6 +189,16 @@ impl Vst3Plugin for Foxcrush {
     const VST3_CLASS_ID: [u8; 16] = *b"FoxcrushBitCrush";
     const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] =
         &[Vst3SubCategory::Fx, Vst3SubCategory::Distortion];
+}
+
+fn smart_rounded() -> std::sync::Arc<dyn Fn(f32) -> String + Send + Sync> {
+    std::sync::Arc::new(|v: f32| {
+        if (v - v.round()).abs() < 0.001 {
+            format!("{}", v.round() as i32)
+        } else {
+            format!("{:.2}", v)
+        }
+    })
 }
 
 nih_export_clap!(Foxcrush);

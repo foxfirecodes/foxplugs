@@ -4,6 +4,7 @@ use vizia_plug::vizia::prelude::*;
 use vizia_plug::vizia::vg;
 use vizia_plug::widgets::param_base::ParamWidgetBase;
 use vizia_plug::widgets::util::ModifiersExt;
+use vizia_plug::widgets::RawParamEvent;
 
 const KNOB_DIAMETER: f32 = 64.0;
 const TRACK_THICKNESS: f32 = 5.0;
@@ -19,6 +20,7 @@ const GRANULAR_DRAG_MULTIPLIER: f32 = 0.2;
 pub struct ParamKnob {
     text_input_active: SyncSignal<bool>,
     param_base: ParamWidgetBase,
+    snap_step: SyncSignal<Option<f32>>,
 }
 
 #[derive(Debug)]
@@ -37,6 +39,7 @@ impl ParamKnob {
         let param_base = ParamWidgetBase::new(cx, param);
         let bipolar = SyncSignal::new(false);
         let text_input_active = SyncSignal::new(false);
+        let snap_step: SyncSignal<Option<f32>> = SyncSignal::new(None);
 
         let unmodulated = param_base.unmodulated_signal(cx);
         let param_ptr = param_base.param_ptr();
@@ -51,10 +54,11 @@ impl ParamKnob {
         Self {
             text_input_active,
             param_base,
+            snap_step,
         }
         .build(cx, move |cx| {
             VStack::new(cx, |cx| {
-                KnobDial::new(cx, param_base, bipolar, unmodulated, param_ptr);
+                KnobDial::new(cx, param_base, bipolar, unmodulated, param_ptr, snap_step);
 
                 Label::new(cx, name_text.clone()).class("knob-name");
 
@@ -106,8 +110,12 @@ impl View for ParamKnob {
             ParamKnobEvent::SubmitTextInput(s) => {
                 if let Some(normalized) = self.param_base.string_to_normalized_value(s) {
                     self.param_base.begin_set_parameter(cx);
-                    self.param_base
-                        .set_normalized_value(cx, normalized.clamp(0.0, 1.0));
+                    // Emit the raw event directly so the typed value bypasses the knob's
+                    // snap-to-step logic — the user can dial in any value via the text box.
+                    cx.emit(RawParamEvent::SetParameterNormalized(
+                        self.param_base.param_ptr(),
+                        normalized.clamp(0.0, 1.0),
+                    ));
                     self.param_base.end_set_parameter(cx);
                 }
                 self.text_input_active.set(false);
@@ -124,21 +132,12 @@ impl View for ParamKnob {
 }
 
 pub trait ParamKnobExt {
-    fn bipolar(self, on: bool) -> Self;
+    fn snap_to(self, step: Option<f32>) -> Self;
 }
 
 impl ParamKnobExt for Handle<'_, ParamKnob> {
-    fn bipolar(self, _on: bool) -> Self {
-        // bipolar state is held in a signal owned by KnobDial — this is the public toggle
-        // surface; the actual signal is wired in `KnobDial::new`. We forward the value via a
-        // shared `SyncSignal` set up at construction.
-        //
-        // For the current implementation, the signal defaults to `false` and the param's
-        // "centered default" hint is what makes the output knob render bipolar. To make this
-        // toggle work, we'd need to thread the signal through into the View handle. For now,
-        // bipolar mode is detected automatically: if the param's default sits near 0.5
-        // normalized, the dial fills from center.
-        self
+    fn snap_to(self, step: Option<f32>) -> Self {
+        self.modify(|k: &mut ParamKnob| k.snap_step.set(step))
     }
 }
 
@@ -147,6 +146,7 @@ struct KnobDial {
     bipolar_signal: SyncSignal<bool>,
     value_signal: SyncSignal<f32>,
     param_ptr: ParamPtr,
+    snap_step: SyncSignal<Option<f32>>,
 
     drag_active: bool,
     drag_start_y: f32,
@@ -161,6 +161,7 @@ impl KnobDial {
         bipolar_signal: SyncSignal<bool>,
         value_signal: SyncSignal<f32>,
         param_ptr: ParamPtr,
+        snap_step: SyncSignal<Option<f32>>,
     ) {
         let default_normalized = unsafe { param_ptr.default_normalized_value() };
         if (0.45..=0.55).contains(&default_normalized) {
@@ -172,6 +173,7 @@ impl KnobDial {
             bipolar_signal,
             value_signal,
             param_ptr,
+            snap_step,
             drag_active: false,
             drag_start_y: 0.0,
             drag_start_value: 0.0,
@@ -185,6 +187,43 @@ impl KnobDial {
         .bind(bipolar_signal, |mut h| h.needs_redraw());
     }
 
+    /// Snap a normalized value to the nearest step (in plain units), if a snap step is set.
+    fn snap_normalized(&self, normalized: f32) -> f32 {
+        match self.snap_step.get() {
+            Some(step) if step > 0.0 => {
+                let plain = unsafe { self.param_ptr.preview_plain(normalized) };
+                let snapped_plain = (plain / step).round() * step;
+                unsafe { self.param_ptr.preview_normalized(snapped_plain) }
+            }
+            _ => normalized,
+        }
+    }
+
+    /// Step to the next/previous snap point in plain units. Falls back to nih-plug's naive
+    /// step (≈2% of the normalized range) when no snap step is configured.
+    fn step_normalized(&self, current_normalized: f32, going_up: bool, finer: bool) -> f32 {
+        match self.snap_step.get() {
+            Some(step) if step > 0.0 => {
+                let effective_step = if finer { step / 10.0 } else { step };
+                let plain = unsafe { self.param_ptr.preview_plain(current_normalized) };
+                let next_plain = if going_up {
+                    ((plain / effective_step).floor() + 1.0) * effective_step
+                } else {
+                    ((plain / effective_step).ceil() - 1.0) * effective_step
+                };
+                unsafe { self.param_ptr.preview_normalized(next_plain) }
+            }
+            _ => {
+                if going_up {
+                    self.param_base.next_normalized_step(current_normalized, finer)
+                } else {
+                    self.param_base
+                        .previous_normalized_step(current_normalized, finer)
+                }
+            }
+        }
+    }
+
     fn handle_drag(&mut self, cx: &mut EventContext, current_y: f32) {
         let multiplier = if cx.modifiers().shift() {
             GRANULAR_DRAG_MULTIPLIER
@@ -195,7 +234,8 @@ impl KnobDial {
         let delta_normalized =
             (delta_pixels / DRAG_PIXELS_PER_FULL_RANGE) * multiplier * cx.scale_factor();
         let new_value = (self.drag_start_value + delta_normalized).clamp(0.0, 1.0);
-        self.param_base.set_normalized_value(cx, new_value);
+        let snapped = self.snap_normalized(new_value);
+        self.param_base.set_normalized_value(cx, snapped);
     }
 
     fn reset_to_default(&self, cx: &mut EventContext) {
@@ -269,12 +309,12 @@ impl View for KnobDial {
                     }
                     let mut current = self.param_base.unmodulated_normalized_value();
                     while self.scrolled_lines >= 1.0 {
-                        current = self.param_base.next_normalized_step(current, finer);
+                        current = self.step_normalized(current, true, finer);
                         self.param_base.set_normalized_value(cx, current);
                         self.scrolled_lines -= 1.0;
                     }
                     while self.scrolled_lines <= -1.0 {
-                        current = self.param_base.previous_normalized_step(current, finer);
+                        current = self.step_normalized(current, false, finer);
                         self.param_base.set_normalized_value(cx, current);
                         self.scrolled_lines += 1.0;
                     }

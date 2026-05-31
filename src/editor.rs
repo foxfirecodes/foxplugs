@@ -90,14 +90,14 @@ pub(crate) fn create(
 
             VStack::new(cx, |cx| {
                 HStack::new(cx, |cx| {
-                    knob_cell(cx, &params.bit_depth, false);
-                    knob_cell(cx, &params.downsample, false);
+                    knob_cell(cx, &params.bit_depth, Some(0.5));
+                    knob_cell(cx, &params.downsample, Some(1.0));
                 })
                 .class("knob-row");
 
                 HStack::new(cx, |cx| {
-                    knob_cell(cx, &params.mix, false);
-                    knob_cell(cx, &params.output_gain, true);
+                    knob_cell(cx, &params.mix, Some(0.01));
+                    knob_cell(cx, &params.output_gain, Some(0.05));
                 })
                 .class("knob-row");
             })
@@ -110,7 +110,7 @@ pub(crate) fn create(
 fn knob_cell<P: nih_plug::params::Param + 'static>(
     cx: &mut Context,
     param: &P,
-    bipolar: bool,
+    snap_step: Option<f32>,
 ) {
-    ParamKnob::new(cx, param).bipolar(bipolar);
+    ParamKnob::new(cx, param).snap_to(snap_step);
 }
