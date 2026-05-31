@@ -96,7 +96,7 @@ impl Default for FoxcrushParams {
 impl Plugin for Foxcrush {
     const NAME: &'static str = "Foxcrush";
     const VENDOR: &'static str = "foxfire";
-    const URL: &'static str = "https://github.com/foxfire/foxcrush";
+    const URL: &'static str = "https://github.com/foxfire/foxplugs";
     const EMAIL: &'static str = "rayzr522@gmail.com";
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 

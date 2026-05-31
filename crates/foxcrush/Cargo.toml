@@ -1,0 +1,17 @@
+[package]
+name = "foxcrush"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+description = "A bitcrusher audio effect plugin inspired by Ableton Live's Redux"
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[features]
+default = []
+
+[dependencies]
+nih_plug = { git = "https://github.com/BillyDM/nih-plug.git", features = ["assert_process_allocs", "standalone"] }
+vizia_plug = { git = "https://github.com/vizia/vizia-plug.git" }
