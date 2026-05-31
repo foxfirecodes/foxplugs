@@ -215,7 +215,8 @@ impl KnobDial {
             }
             _ => {
                 if going_up {
-                    self.param_base.next_normalized_step(current_normalized, finer)
+                    self.param_base
+                        .next_normalized_step(current_normalized, finer)
                 } else {
                     self.param_base
                         .previous_normalized_step(current_normalized, finer)
