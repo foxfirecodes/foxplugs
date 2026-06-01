@@ -1,78 +1,10 @@
+use foxplugs_ui::{ParamKnob, ParamKnobOptions, FOXPLUGS_DARK_STYLESHEET};
 use nih_plug::prelude::Editor;
 use std::sync::Arc;
 use vizia_plug::vizia::prelude::*;
 use vizia_plug::{create_vizia_editor, ViziaState, ViziaTheming};
 
-use crate::widgets::{ParamKnob, ParamKnobExt};
 use crate::FoxcrushParams;
-
-const STYLESHEET: &str = r#"
-* {
-    background-color: #0d0c14;
-    color: #d8d6e2;
-    font-size: 13;
-}
-
-label {
-    background-color: transparent;
-    color: #d8d6e2;
-}
-
-label.title {
-    font-size: 26;
-    color: #b388ff;
-    height: 48px;
-    alignment: bottom-center;
-}
-
-vstack.knob-grid {
-    row-between: 14px;
-    child-space: 16px;
-    width: 1s;
-}
-
-hstack.knob-row {
-    col-between: 18px;
-    width: 1s;
-    alignment: center;
-}
-
-vstack.knob-cell {
-    width: 1s;
-    row-between: 6px;
-    alignment: top-center;
-}
-
-label.knob-name {
-    color: #6ea8fe;
-    font-size: 11;
-    alignment: center;
-}
-
-label.knob-value {
-    color: #d8d6e2;
-    font-size: 12;
-    alignment: center;
-}
-
-label.knob-value:hover {
-    color: #b388ff;
-}
-
-textbox.knob-value-input {
-    background-color: #1a1825;
-    color: #d8d6e2;
-    border-color: #b388ff;
-    border-width: 1px;
-    corner-radius: 3px;
-    padding: 2px 4px;
-    font-size: 12;
-}
-
-knob-dial {
-    background-color: transparent;
-}
-"#;
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
     ViziaState::new(|| (340, 360))
@@ -83,7 +15,7 @@ pub(crate) fn create(
     editor_state: Arc<ViziaState>,
 ) -> Option<Box<dyn Editor>> {
     create_vizia_editor(editor_state, ViziaTheming::Custom, move |cx, _| {
-        cx.add_stylesheet(STYLESHEET).ok();
+        cx.add_stylesheet(FOXPLUGS_DARK_STYLESHEET).ok();
 
         VStack::new(cx, |cx| {
             Label::new(cx, "foxcrush").class("title");
@@ -97,6 +29,7 @@ pub(crate) fn create(
 
                 HStack::new(cx, |cx| {
                     knob_cell(cx, &params.mix, Some(0.01));
+                    // Output gain is stored as linear gain, so snapping remains in linear units.
                     knob_cell(cx, &params.output_gain, Some(0.05));
                 })
                 .class("knob-row");
@@ -112,5 +45,9 @@ fn knob_cell<P: nih_plug::params::Param + 'static>(
     param: &P,
     snap_step: Option<f32>,
 ) {
-    ParamKnob::new(cx, param).snap_to(snap_step);
+    ParamKnob::new(
+        cx,
+        param,
+        ParamKnobOptions::default().with_snap_step(snap_step),
+    );
 }

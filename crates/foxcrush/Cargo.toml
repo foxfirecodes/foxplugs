@@ -10,8 +10,11 @@ repository.workspace = true
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = []
+default = ["gui"]
+gui = ["dep:foxplugs-ui", "dep:vizia_plug"]
+dev-assert-process-allocs = ["nih_plug/assert_process_allocs"]
 
 [dependencies]
-nih_plug = { git = "https://github.com/BillyDM/nih-plug.git", features = ["assert_process_allocs", "standalone"] }
-vizia_plug = { git = "https://github.com/vizia/vizia-plug.git" }
+foxplugs-ui = { workspace = true, optional = true }
+nih_plug = { workspace = true, features = ["standalone"] }
+vizia_plug = { workspace = true, optional = true }

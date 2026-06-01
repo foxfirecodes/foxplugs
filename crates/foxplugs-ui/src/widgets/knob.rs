@@ -6,7 +6,10 @@ use vizia_plug::widgets::param_base::ParamWidgetBase;
 use vizia_plug::widgets::util::ModifiersExt;
 use vizia_plug::widgets::RawParamEvent;
 
-const KNOB_DIAMETER: f32 = 64.0;
+const DEFAULT_KNOB_DIAMETER: f32 = 64.0;
+const DEFAULT_DRAG_PIXELS_PER_FULL_RANGE: f32 = 200.0;
+const GRANULAR_DRAG_MULTIPLIER: f32 = 0.2;
+
 const TRACK_THICKNESS: f32 = 5.0;
 const INDICATOR_THICKNESS: f32 = 3.0;
 const INDICATOR_LENGTH_RATIO: f32 = 0.55;
@@ -14,13 +17,54 @@ const INDICATOR_LENGTH_RATIO: f32 = 0.55;
 const ARC_START_DEG: f32 = 135.0;
 const ARC_SWEEP_DEG: f32 = 270.0;
 
-const DRAG_PIXELS_PER_FULL_RANGE: f32 = 200.0;
-const GRANULAR_DRAG_MULTIPLIER: f32 = 0.2;
+#[derive(Clone, Copy, Debug)]
+pub struct ParamKnobOptions {
+    /// Snap knob drag/scroll movement to a step in the parameter's plain units.
+    /// Text entry intentionally bypasses snapping so precise values remain possible.
+    pub snap_step: Option<f32>,
+    /// Explicit bipolar drawing mode. `None` preserves the old convenience heuristic:
+    /// defaults near normalized center render as bipolar.
+    pub bipolar: Option<bool>,
+    pub diameter: f32,
+    pub drag_pixels_per_full_range: f32,
+}
+
+impl Default for ParamKnobOptions {
+    fn default() -> Self {
+        Self {
+            snap_step: None,
+            bipolar: None,
+            diameter: DEFAULT_KNOB_DIAMETER,
+            drag_pixels_per_full_range: DEFAULT_DRAG_PIXELS_PER_FULL_RANGE,
+        }
+    }
+}
+
+impl ParamKnobOptions {
+    pub fn with_snap_step(mut self, step: Option<f32>) -> Self {
+        self.snap_step = step;
+        self
+    }
+
+    pub fn with_bipolar(mut self, bipolar: Option<bool>) -> Self {
+        self.bipolar = bipolar;
+        self
+    }
+
+    pub fn with_diameter(mut self, diameter: f32) -> Self {
+        self.diameter = diameter;
+        self
+    }
+
+    pub fn with_drag_pixels_per_full_range(mut self, pixels: f32) -> Self {
+        self.drag_pixels_per_full_range = pixels;
+        self
+    }
+}
 
 pub struct ParamKnob {
     text_input_active: SyncSignal<bool>,
     param_base: ParamWidgetBase,
-    snap_step: SyncSignal<Option<f32>>,
 }
 
 #[derive(Debug)]
@@ -31,7 +75,11 @@ pub enum ParamKnobEvent {
 }
 
 impl ParamKnob {
-    pub fn new<'c, 'p, P>(cx: &'c mut Context, param: &'p P) -> Handle<'c, Self>
+    pub fn new<'c, 'p, P>(
+        cx: &'c mut Context,
+        param: &'p P,
+        options: ParamKnobOptions,
+    ) -> Handle<'c, Self>
     where
         'p: 'c,
         P: Param + 'static,
@@ -39,26 +87,26 @@ impl ParamKnob {
         let param_base = ParamWidgetBase::new(cx, param);
         let bipolar = SyncSignal::new(false);
         let text_input_active = SyncSignal::new(false);
-        let snap_step: SyncSignal<Option<f32>> = SyncSignal::new(None);
 
         let unmodulated = param_base.unmodulated_signal(cx);
         let param_ptr = param_base.param_ptr();
 
         let display_value: Memo<String> = Memo::new(move |_| {
             let current = unmodulated.get();
+            // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
             unsafe { param_ptr.normalized_value_to_string(current, true) }
         });
 
+        // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
         let name_text: String = unsafe { param_ptr.name() }.to_string();
 
         Self {
             text_input_active,
             param_base,
-            snap_step,
         }
         .build(cx, move |cx| {
             VStack::new(cx, |cx| {
-                KnobDial::new(cx, param_base, bipolar, unmodulated, param_ptr, snap_step);
+                KnobDial::new(cx, param_base, bipolar, unmodulated, param_ptr, options);
 
                 Label::new(cx, name_text.clone()).class("knob-name");
 
@@ -79,7 +127,7 @@ impl ParamKnob {
                                 cx.emit(TextEvent::StartEdit);
                                 cx.emit(TextEvent::SelectAll);
                             })
-                            .width(Pixels(KNOB_DIAMETER + 20.0))
+                            .width(Pixels(options.diameter + 20.0))
                             .alignment(Alignment::Center);
                     } else {
                         Label::new(cx, display_value)
@@ -110,8 +158,7 @@ impl View for ParamKnob {
             ParamKnobEvent::SubmitTextInput(s) => {
                 if let Some(normalized) = self.param_base.string_to_normalized_value(s) {
                     self.param_base.begin_set_parameter(cx);
-                    // Emit the raw event directly so the typed value bypasses the knob's
-                    // snap-to-step logic — the user can dial in any value via the text box.
+                    // Emit the raw event directly so typed values bypass snap-to-step logic.
                     cx.emit(RawParamEvent::SetParameterNormalized(
                         self.param_base.param_ptr(),
                         normalized.clamp(0.0, 1.0),
@@ -131,22 +178,12 @@ impl View for ParamKnob {
     }
 }
 
-pub trait ParamKnobExt {
-    fn snap_to(self, step: Option<f32>) -> Self;
-}
-
-impl ParamKnobExt for Handle<'_, ParamKnob> {
-    fn snap_to(self, step: Option<f32>) -> Self {
-        self.modify(|k: &mut ParamKnob| k.snap_step.set(step))
-    }
-}
-
 struct KnobDial {
     param_base: ParamWidgetBase,
     bipolar_signal: SyncSignal<bool>,
     value_signal: SyncSignal<f32>,
     param_ptr: ParamPtr,
-    snap_step: SyncSignal<Option<f32>>,
+    options: ParamKnobOptions,
 
     drag_active: bool,
     drag_start_y: f32,
@@ -161,19 +198,21 @@ impl KnobDial {
         bipolar_signal: SyncSignal<bool>,
         value_signal: SyncSignal<f32>,
         param_ptr: ParamPtr,
-        snap_step: SyncSignal<Option<f32>>,
+        options: ParamKnobOptions,
     ) {
+        // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
         let default_normalized = unsafe { param_ptr.default_normalized_value() };
-        if (0.45..=0.55).contains(&default_normalized) {
-            bipolar_signal.set(true);
-        }
+        let bipolar = options
+            .bipolar
+            .unwrap_or_else(|| (0.45..=0.55).contains(&default_normalized));
+        bipolar_signal.set(bipolar);
 
         Self {
             param_base,
             bipolar_signal,
             value_signal,
             param_ptr,
-            snap_step,
+            options,
             drag_active: false,
             drag_start_y: 0.0,
             drag_start_value: 0.0,
@@ -181,36 +220,37 @@ impl KnobDial {
         }
         .build(cx, |_| {})
         .class("knob-dial")
-        .width(Pixels(KNOB_DIAMETER))
-        .height(Pixels(KNOB_DIAMETER))
+        .width(Pixels(options.diameter))
+        .height(Pixels(options.diameter))
         .bind(value_signal, |mut h| h.needs_redraw())
         .bind(bipolar_signal, |mut h| h.needs_redraw());
     }
 
-    /// Snap a normalized value to the nearest step (in plain units), if a snap step is set.
     fn snap_normalized(&self, normalized: f32) -> f32 {
-        match self.snap_step.get() {
+        match self.options.snap_step {
             Some(step) if step > 0.0 => {
+                // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
                 let plain = unsafe { self.param_ptr.preview_plain(normalized) };
                 let snapped_plain = (plain / step).round() * step;
+                // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
                 unsafe { self.param_ptr.preview_normalized(snapped_plain) }
             }
             _ => normalized,
         }
     }
 
-    /// Step to the next/previous snap point in plain units. Falls back to nih-plug's naive
-    /// step (≈2% of the normalized range) when no snap step is configured.
     fn step_normalized(&self, current_normalized: f32, going_up: bool, finer: bool) -> f32 {
-        match self.snap_step.get() {
+        match self.options.snap_step {
             Some(step) if step > 0.0 => {
                 let effective_step = if finer { step / 10.0 } else { step };
+                // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
                 let plain = unsafe { self.param_ptr.preview_plain(current_normalized) };
                 let next_plain = if going_up {
                     ((plain / effective_step).floor() + 1.0) * effective_step
                 } else {
                     ((plain / effective_step).ceil() - 1.0) * effective_step
                 };
+                // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
                 unsafe { self.param_ptr.preview_normalized(next_plain) }
             }
             _ => {
@@ -232,8 +272,9 @@ impl KnobDial {
             1.0
         };
         let delta_pixels = self.drag_start_y - current_y;
-        let delta_normalized =
-            (delta_pixels / DRAG_PIXELS_PER_FULL_RANGE) * multiplier * cx.scale_factor();
+        let delta_normalized = (delta_pixels / self.options.drag_pixels_per_full_range)
+            * multiplier
+            * cx.scale_factor();
         let new_value = (self.drag_start_value + delta_normalized).clamp(0.0, 1.0);
         let snapped = self.snap_normalized(new_value);
         self.param_base.set_normalized_value(cx, snapped);
@@ -342,6 +383,7 @@ impl View for KnobDial {
 
         let value = self.value_signal.get().clamp(0.0, 1.0);
         let bipolar = self.bipolar_signal.get();
+        // SAFETY: ParamPtr comes from ParamWidgetBase for the lifetime of this widget.
         let default_normalized = unsafe { self.param_ptr.default_normalized_value() };
 
         let track_color = vg::Color::from_argb(255, 42, 38, 56);

@@ -478,10 +478,33 @@ cargo xtask bundle foxcrush --release
 
 If GUI/native dependencies make full workspace tests slow or flaky, prioritize the DSP-only test path until the headless/shared-DSP split is complete.
 
-## Open decisions before implementation
+## Implementation status
 
-1. Should `bit_depth` be integer-only, half-step, or fully continuous?
-2. Should `downsample` be integer-only or intentionally fractional/continuous?
-3. Should output gain snapping happen in dB units or linear gain units?
-4. Should Foxcrush remain stereo-only for v1, or should the refactor prepare variable channel counts now?
-5. Should `assert_process_allocs` remain always enabled during early development, or be gated immediately?
+Implemented in the first refactor pass:
+
+- DSP tests for quantization, continuous bit depth, fractional downsample, downsample hold behavior, and reset/first-sample capture.
+- Reset/first-sample sample-hold transient fix using explicit `needs_sample` state.
+- Quantization scale calculation moved out of the per-channel DSP path and into the per-frame parameter snapshot.
+- Fixed stereo processor state with safe iterator zipping instead of channel-state indexing.
+- Continuous `bit_depth` and continuous/fractional `downsample` semantics preserved and documented.
+- `params.rs` split out of `lib.rs` with private reusable parameter builder helpers.
+- `processor.rs` added so `Plugin::process()` is a thin NIH-plug adapter.
+- `ParamKnobOptions` added and `ParamKnob` extracted to the new `foxplugs-ui` crate.
+- Output gain snapping intentionally preserved in linear gain units.
+- Workspace-level `xtask` moved to `crates/xtask`.
+- Shared dependencies centralized under `[workspace.dependencies]`.
+- GUI is behind the default `gui` feature, enabling a fast `--no-default-features` DSP/processor test path.
+- README and architecture docs updated.
+
+Deliberate deferrals:
+
+- `foxplugs-dsp` was not extracted yet because there is no concrete second-plugin DSP reuse. Foxcrush now has a clean DSP/processor seam, and a shared DSP crate should be introduced when reuse is real.
+- `foxplugs-plugin` was not extracted yet; common parameter helpers are private in `foxcrush::params` until another plugin needs them.
+
+## Resolved decisions
+
+1. `bit_depth` remains continuous for now.
+2. `downsample` remains continuous/fractional for now.
+3. Output gain snapping remains in linear gain units.
+4. Foxcrush remains stereo-only for v1.
+5. `assert_process_allocs` is gated behind the `dev-assert-process-allocs` feature.

@@ -1,96 +1,19 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
-use vizia_plug::ViziaState;
 
 mod dsp;
+#[cfg(feature = "gui")]
 mod editor;
-mod widgets;
+mod params;
+mod processor;
 
-use dsp::BitcrushChannelState;
+pub use params::FoxcrushParams;
+use processor::{Bitcrusher, BitcrusherFrameParams};
 
+#[derive(Default)]
 pub struct Foxcrush {
     params: Arc<FoxcrushParams>,
-    channel_states: Vec<BitcrushChannelState>,
-}
-
-#[derive(Params)]
-pub struct FoxcrushParams {
-    #[persist = "editor-state"]
-    editor_state: Arc<ViziaState>,
-
-    #[id = "bit_depth"]
-    pub bit_depth: FloatParam,
-
-    #[id = "downsample"]
-    pub downsample: FloatParam,
-
-    #[id = "mix"]
-    pub mix: FloatParam,
-
-    #[id = "output_gain"]
-    pub output_gain: FloatParam,
-}
-
-impl Default for Foxcrush {
-    fn default() -> Self {
-        Self {
-            params: Arc::new(FoxcrushParams::default()),
-            channel_states: Vec::new(),
-        }
-    }
-}
-
-impl Default for FoxcrushParams {
-    fn default() -> Self {
-        Self {
-            editor_state: editor::default_state(),
-
-            bit_depth: FloatParam::new(
-                "Bit Depth",
-                16.0,
-                FloatRange::Linear {
-                    min: 2.0,
-                    max: 16.0,
-                },
-            )
-            .with_smoother(SmoothingStyle::Linear(20.0))
-            .with_unit(" bits")
-            .with_value_to_string(smart_rounded()),
-
-            downsample: FloatParam::new(
-                "Downsample",
-                1.0,
-                FloatRange::Skewed {
-                    min: 1.0,
-                    max: 50.0,
-                    factor: FloatRange::skew_factor(-1.0),
-                },
-            )
-            .with_smoother(SmoothingStyle::Linear(20.0))
-            .with_unit("x")
-            .with_value_to_string(smart_rounded()),
-
-            mix: FloatParam::new("Mix", 1.0, FloatRange::Linear { min: 0.0, max: 1.0 })
-                .with_smoother(SmoothingStyle::Linear(20.0))
-                .with_unit("%")
-                .with_value_to_string(formatters::v2s_f32_percentage(0))
-                .with_string_to_value(formatters::s2v_f32_percentage()),
-
-            output_gain: FloatParam::new(
-                "Output",
-                util::db_to_gain(0.0),
-                FloatRange::Skewed {
-                    min: util::db_to_gain(-12.0),
-                    max: util::db_to_gain(12.0),
-                    factor: FloatRange::gain_skew_factor(-12.0, 12.0),
-                },
-            )
-            .with_smoother(SmoothingStyle::Logarithmic(50.0))
-            .with_unit(" dB")
-            .with_value_to_string(formatters::v2s_f32_gain_to_db(2))
-            .with_string_to_value(formatters::s2v_f32_gain_to_db()),
-        }
-    }
+    processor: Bitcrusher,
 }
 
 impl Plugin for Foxcrush {
@@ -101,8 +24,8 @@ impl Plugin for Foxcrush {
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
     const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {
-        main_input_channels: NonZeroU32::new(2),
-        main_output_channels: NonZeroU32::new(2),
+        main_input_channels: NonZeroU32::new(Bitcrusher::CHANNELS as u32),
+        main_output_channels: NonZeroU32::new(Bitcrusher::CHANNELS as u32),
         ..AudioIOLayout::const_default()
     }];
 
@@ -116,28 +39,18 @@ impl Plugin for Foxcrush {
         self.params.clone()
     }
 
+    #[cfg(feature = "gui")]
     fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
         editor::create(self.params.clone(), self.params.editor_state.clone())
     }
 
-    fn initialize(
-        &mut self,
-        audio_io_layout: &AudioIOLayout,
-        _buffer_config: &BufferConfig,
-        _context: &mut impl InitContext<Self>,
-    ) -> bool {
-        let channels = audio_io_layout
-            .main_output_channels
-            .map(|n| n.get() as usize)
-            .unwrap_or(2);
-        self.channel_states = vec![BitcrushChannelState::default(); channels];
-        true
+    #[cfg(not(feature = "gui"))]
+    fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+        None
     }
 
     fn reset(&mut self) {
-        for state in &mut self.channel_states {
-            state.reset();
-        }
+        self.processor.reset();
     }
 
     fn process(
@@ -147,21 +60,15 @@ impl Plugin for Foxcrush {
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
         for mut channel_samples in buffer.iter_samples() {
-            let bit_depth = self.params.bit_depth.smoothed.next();
-            let downsample = self.params.downsample.smoothed.next();
-            let mix = self.params.mix.smoothed.next();
-            let output_gain = self.params.output_gain.smoothed.next();
+            let frame_params = BitcrusherFrameParams::from_plain_values(
+                self.params.bit_depth.smoothed.next(),
+                self.params.downsample.smoothed.next(),
+                self.params.mix.smoothed.next(),
+                self.params.output_gain.smoothed.next(),
+            );
 
-            for (ch_idx, sample) in channel_samples.iter_mut().enumerate() {
-                let dry = *sample;
-                let crushed = dsp::process_sample(
-                    dry,
-                    bit_depth,
-                    downsample,
-                    &mut self.channel_states[ch_idx],
-                );
-                *sample = (dry * (1.0 - mix) + crushed * mix) * output_gain;
-            }
+            self.processor
+                .process_frame(channel_samples.iter_mut(), frame_params);
         }
 
         ProcessStatus::Normal
@@ -185,16 +92,6 @@ impl Vst3Plugin for Foxcrush {
     const VST3_CLASS_ID: [u8; 16] = *b"FoxcrushBitCrush";
     const VST3_SUBCATEGORIES: &'static [Vst3SubCategory] =
         &[Vst3SubCategory::Fx, Vst3SubCategory::Distortion];
-}
-
-fn smart_rounded() -> std::sync::Arc<dyn Fn(f32) -> String + Send + Sync> {
-    std::sync::Arc::new(|v: f32| {
-        if (v - v.round()).abs() < 0.001 {
-            format!("{}", v.round() as i32)
-        } else {
-            format!("{:.2}", v)
-        }
-    })
 }
 
 nih_export_clap!(Foxcrush);
