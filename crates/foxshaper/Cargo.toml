@@ -19,4 +19,5 @@ foxplugs-dsp = { workspace = true }
 foxplugs-plugin = { workspace = true }
 foxplugs-ui = { workspace = true, optional = true }
 nih_plug = { workspace = true, features = ["standalone"] }
+serde = { version = "1", features = ["derive"] }
 vizia_plug = { workspace = true, optional = true }

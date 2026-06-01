@@ -63,30 +63,93 @@ pub struct FoxshaperProcessor {
 pub struct AudioTriggerDetector {
     was_above_threshold: bool,
     cooldown_remaining: u32,
+    lowpass_state: f32,
+    highpass_prev_input: f32,
+    highpass_prev_output: f32,
 }
 
 impl AudioTriggerDetector {
     pub fn reset(&mut self) {
         self.was_above_threshold = false;
         self.cooldown_remaining = 0;
+        self.lowpass_state = 0.0;
+        self.highpass_prev_input = 0.0;
+        self.highpass_prev_output = 0.0;
     }
 
+    #[cfg(test)]
     pub fn detect(&mut self, input_level: f32, threshold: f32, sample_rate: f32) -> bool {
+        self.detect_level(input_level, threshold, sample_rate, 0.5)
+    }
+
+    pub fn detect_filtered(
+        &mut self,
+        input: f32,
+        threshold: f32,
+        sample_rate: f32,
+        low_cut_hz: f32,
+        high_cut_hz: f32,
+        detail: f32,
+    ) -> bool {
+        let filtered = self.filter_input(input, sample_rate, low_cut_hz, high_cut_hz);
+        self.detect_level(filtered.abs(), threshold, sample_rate, detail)
+    }
+
+    fn detect_level(
+        &mut self,
+        input_level: f32,
+        threshold: f32,
+        sample_rate: f32,
+        detail: f32,
+    ) -> bool {
         if self.cooldown_remaining > 0 {
             self.cooldown_remaining -= 1;
         }
 
-        let threshold = threshold.max(0.0);
+        let detail = detail.clamp(0.0, 1.0);
+        let threshold = threshold.max(0.0) * (1.5 - detail).clamp(0.5, 1.5);
         let above = input_level >= threshold;
         let triggered = above && !self.was_above_threshold && self.cooldown_remaining == 0;
         self.was_above_threshold = above;
 
         if triggered {
-            self.cooldown_remaining =
-                (AUDIO_TRIGGER_COOLDOWN_MS * 0.001 * sample_rate.max(1.0)).round() as u32;
+            let cooldown_ms = AUDIO_TRIGGER_COOLDOWN_MS * (1.5 - detail).clamp(0.25, 1.5);
+            self.cooldown_remaining = (cooldown_ms * 0.001 * sample_rate.max(1.0)).round() as u32;
         }
 
         triggered
+    }
+
+    fn filter_input(
+        &mut self,
+        input: f32,
+        sample_rate: f32,
+        low_cut_hz: f32,
+        high_cut_hz: f32,
+    ) -> f32 {
+        let sample_rate = sample_rate.max(1.0);
+        let mut output = input;
+
+        let low_cut_hz = low_cut_hz.clamp(0.0, sample_rate * 0.49);
+        if low_cut_hz > 0.0 {
+            let dt = 1.0 / sample_rate;
+            let rc = 1.0 / (std::f32::consts::TAU * low_cut_hz.max(1.0));
+            let alpha = rc / (rc + dt);
+            output = alpha * (self.highpass_prev_output + input - self.highpass_prev_input);
+            self.highpass_prev_input = input;
+            self.highpass_prev_output = output;
+        }
+
+        let high_cut_hz = high_cut_hz.clamp(1.0, sample_rate * 0.49);
+        if high_cut_hz < sample_rate * 0.49 {
+            let dt = 1.0 / sample_rate;
+            let rc = 1.0 / (std::f32::consts::TAU * high_cut_hz);
+            let alpha = dt / (rc + dt);
+            self.lowpass_state += alpha * (output - self.lowpass_state);
+            output = self.lowpass_state;
+        }
+
+        output
     }
 }
 

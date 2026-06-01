@@ -32,6 +32,14 @@ impl Plugin for Foxshaper {
     const AUDIO_IO_LAYOUTS: &'static [AudioIOLayout] = &[AudioIOLayout {
         main_input_channels: NonZeroU32::new(FoxshaperProcessor::CHANNELS as u32),
         main_output_channels: NonZeroU32::new(FoxshaperProcessor::CHANNELS as u32),
+        aux_input_ports: &[new_nonzero_u32(FoxshaperProcessor::CHANNELS as u32)],
+        names: PortNames {
+            layout: Some("Stereo with Sidechain"),
+            main_input: Some("Input"),
+            main_output: Some("Output"),
+            aux_inputs: &["Sidechain"],
+            aux_outputs: &[],
+        },
         ..AudioIOLayout::const_default()
     }];
 
@@ -73,7 +81,7 @@ impl Plugin for Foxshaper {
     fn process(
         &mut self,
         buffer: &mut Buffer,
-        _aux: &mut AuxiliaryBuffers,
+        aux: &mut AuxiliaryBuffers,
         context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
         let transport = context.transport();
@@ -92,8 +100,14 @@ impl Plugin for Foxshaper {
         let use_one_shot = self.params.loop_mode.value() == LoopMode::OneShot;
         let midi_switch = self.params.midi_switch.value();
         let end_marker = self.params.end_marker.value();
+        let audio_sidechain = self.params.audio_sidechain.value();
         let sample_rate = transport.sample_rate;
         let start_pos_beats = transport.pos_beats;
+        let sidechain_inputs = if audio_sidechain {
+            aux.inputs.first().map(|input| input.as_slice_immutable())
+        } else {
+            None
+        };
         let mut next_event = if use_midi_trigger {
             context.next_event()
         } else {
@@ -126,15 +140,31 @@ impl Plugin for Foxshaper {
             }
 
             if use_audio_trigger {
-                let input_level = channel_samples
-                    .iter_mut()
-                    .take(FoxshaperProcessor::CHANNELS)
-                    .map(|sample| sample.abs())
-                    .fold(0.0_f32, f32::max);
-                if self.audio_trigger.detect(
-                    input_level,
+                let detector_input = match sidechain_inputs {
+                    Some(sidechain_inputs) => {
+                        sidechain_inputs
+                            .iter()
+                            .take(FoxshaperProcessor::CHANNELS)
+                            .filter_map(|channel| channel.get(sample_idx).copied())
+                            .sum::<f32>()
+                            / FoxshaperProcessor::CHANNELS as f32
+                    }
+                    None => {
+                        channel_samples
+                            .iter_mut()
+                            .take(FoxshaperProcessor::CHANNELS)
+                            .map(|sample| *sample)
+                            .sum::<f32>()
+                            / FoxshaperProcessor::CHANNELS as f32
+                    }
+                };
+                if self.audio_trigger.detect_filtered(
+                    detector_input,
                     self.params.audio_threshold.smoothed.next(),
                     sample_rate,
+                    self.params.audio_low_cut_hz.smoothed.next(),
+                    self.params.audio_high_cut_hz.smoothed.next(),
+                    self.params.audio_detail.smoothed.next(),
                 ) {
                     self.processor.trigger();
                 }

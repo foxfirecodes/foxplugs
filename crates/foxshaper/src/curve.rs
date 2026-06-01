@@ -1,17 +1,22 @@
 #![cfg_attr(not(feature = "gui"), allow(dead_code))]
 
-use std::sync::atomic::{AtomicU32, AtomicU8, AtomicUsize, Ordering};
+use nih_plug::params::persist::PersistentField;
+use serde::{Deserialize, Serialize};
+use std::sync::{
+    atomic::{AtomicU32, AtomicU8, AtomicUsize, Ordering},
+    Arc,
+};
 
 pub const MAX_CURVE_POINTS: usize = 16;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum PointWeight {
     Hard,
     Medium,
     Soft,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CurvePoint {
     pub phase: f32,
     pub value: f32,
@@ -30,7 +35,7 @@ impl CurvePoint {
 
 const EMPTY_POINT: CurvePoint = CurvePoint::new(0.0, 1.0, PointWeight::Hard);
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Curve {
     points: [CurvePoint; MAX_CURVE_POINTS],
     len: usize,
@@ -96,6 +101,20 @@ impl Default for CurveState {
         };
         state.store_curve(DEFAULT_VOLUME_CURVE);
         state
+    }
+}
+
+impl<'a> PersistentField<'a, Curve> for Arc<CurveState> {
+    fn set(&self, new_value: Curve) {
+        self.store_curve(new_value);
+    }
+
+    fn map<F, R>(&self, f: F) -> R
+    where
+        F: Fn(&Curve) -> R,
+    {
+        let curve = self.snapshot();
+        f(&curve)
     }
 }
 
@@ -366,6 +385,38 @@ mod tests {
         assert!(curve.evaluate(0.25) < 0.25);
         assert_close(curve.evaluate(0.5), 0.5);
         assert!(curve.evaluate(0.75) > 0.75);
+    }
+
+    #[test]
+    fn curve_state_persists_through_persistent_field_trait() {
+        let state = Arc::new(CurveState::default());
+        let replacement = Curve::new(
+            [
+                CurvePoint::new(0.0, 1.0, PointWeight::Hard),
+                CurvePoint::new(0.5, 0.25, PointWeight::Medium),
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+                EMPTY_POINT,
+            ],
+            2,
+        );
+
+        PersistentField::set(&state, replacement);
+        let serialized_len = PersistentField::map(&state, |curve| curve.len());
+
+        assert_eq!(serialized_len, 2);
+        assert_close(state.snapshot().evaluate(0.5), 0.25);
     }
 
     #[test]

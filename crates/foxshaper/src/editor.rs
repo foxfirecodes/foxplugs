@@ -12,7 +12,7 @@ use crate::processor::evaluate_shape;
 use crate::FoxshaperParams;
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (720, 520))
+    ViziaState::new(|| (760, 600))
 }
 
 pub(crate) fn create(
@@ -37,7 +37,6 @@ pub(crate) fn create(
                     knob_cell(cx, &params.trigger_mode, None);
                     knob_cell(cx, &params.loop_mode, None);
                     knob_cell(cx, &params.midi_switch, None);
-                    knob_cell(cx, &params.audio_threshold, Some(0.01));
                 })
                 .class("knob-row");
 
@@ -47,6 +46,15 @@ pub(crate) fn create(
                     knob_cell(cx, &params.depth, Some(0.01));
                     knob_cell(cx, &params.shape, Some(0.01));
                     knob_cell(cx, &params.end_marker, Some(0.01));
+                })
+                .class("knob-row");
+
+                HStack::new(cx, |cx| {
+                    knob_cell(cx, &params.audio_sidechain, None);
+                    knob_cell(cx, &params.audio_threshold, Some(0.01));
+                    knob_cell(cx, &params.audio_low_cut_hz, Some(1.0));
+                    knob_cell(cx, &params.audio_high_cut_hz, Some(10.0));
+                    knob_cell(cx, &params.audio_detail, Some(0.01));
                 })
                 .class("knob-row");
 

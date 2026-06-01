@@ -1296,6 +1296,7 @@ dependencies = [
  "foxplugs-plugin",
  "foxplugs-ui",
  "nih_plug",
+ "serde",
  "vizia_plug",
 ]
 

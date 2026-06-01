@@ -145,8 +145,20 @@ pub struct FoxshaperParams {
     #[id = "end_marker"]
     pub end_marker: FloatParam,
 
+    #[id = "audio_sidechain"]
+    pub audio_sidechain: BoolParam,
+
     #[id = "audio_threshold"]
     pub audio_threshold: FloatParam,
+
+    #[id = "audio_low_cut_hz"]
+    pub audio_low_cut_hz: FloatParam,
+
+    #[id = "audio_high_cut_hz"]
+    pub audio_high_cut_hz: FloatParam,
+
+    #[id = "audio_detail"]
+    pub audio_detail: FloatParam,
 
     #[id = "depth"]
     pub depth: FloatParam,
@@ -172,6 +184,7 @@ pub struct FoxshaperParams {
     #[id = "output_gain"]
     pub output_gain: FloatParam,
 
+    #[persist = "custom-curve"]
     pub(crate) custom_curve: Arc<CurveState>,
 }
 
@@ -189,7 +202,11 @@ impl Default for FoxshaperParams {
             loop_mode: EnumParam::new("Loop", LoopMode::Loop),
             midi_switch: BoolParam::new("MIDI Switch", false),
             end_marker: params::percentage_param("End", 1.0),
+            audio_sidechain: BoolParam::new("Sidechain", false),
             audio_threshold: params::gain_db_param("Audio Thresh", -12.0, -60.0, 0.0),
+            audio_low_cut_hz: params::hz_param("Detect Low", 20.0, 20.0, 5_000.0),
+            audio_high_cut_hz: params::hz_param("Detect High", 20_000.0, 200.0, 20_000.0),
+            audio_detail: params::percentage_param("Detail", 0.5),
             depth: params::percentage_param("Depth", 1.0),
             shape_preset: EnumParam::new("Wave", ShapePreset::Sidechain),
             shape: params::percentage_param("Shape", 0.5),
