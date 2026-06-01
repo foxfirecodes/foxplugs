@@ -102,6 +102,7 @@ impl Plugin for Foxshaper {
                 self.params.mix.smoothed.next(),
                 self.params.trim.smoothed.next(),
                 self.params.output_gain.smoothed.next(),
+                self.params.custom_curve.snapshot(),
             );
 
             if use_beat_sync {

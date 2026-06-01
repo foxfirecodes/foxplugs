@@ -1,8 +1,8 @@
+use crate::curve::CurveState;
 use foxplugs_plugin::params;
 use nih_plug::prelude::*;
-
-#[cfg(feature = "gui")]
 use std::sync::Arc;
+
 #[cfg(feature = "gui")]
 use vizia_plug::ViziaState;
 
@@ -137,6 +137,8 @@ pub struct FoxshaperParams {
 
     #[id = "output_gain"]
     pub output_gain: FloatParam,
+
+    pub(crate) custom_curve: Arc<CurveState>,
 }
 
 impl Default for FoxshaperParams {
@@ -157,6 +159,7 @@ impl Default for FoxshaperParams {
             mix: params::mix_param(1.0),
             trim: params::gain_db_param("Trim", 0.0, -24.0, 24.0),
             output_gain: params::output_gain_param(0.0),
+            custom_curve: Arc::new(CurveState::default()),
         }
     }
 }

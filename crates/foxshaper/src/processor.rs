@@ -1,4 +1,4 @@
-use crate::curve::DEFAULT_VOLUME_CURVE;
+use crate::curve::{Curve, DEFAULT_VOLUME_CURVE};
 use crate::params::{ShapePreset, SyncLength, SyncRhythm};
 use foxplugs_dsp::{dry_wet, lerp, lfo, STEREO_CHANNELS};
 
@@ -16,6 +16,7 @@ pub struct FoxshaperFrameParams {
     pub mix: f32,
     pub trim_gain: f32,
     pub output_gain: f32,
+    pub custom_curve: Curve,
 }
 
 impl FoxshaperFrameParams {
@@ -30,6 +31,7 @@ impl FoxshaperFrameParams {
         mix: f32,
         trim_gain: f32,
         output_gain: f32,
+        custom_curve: Curve,
     ) -> Self {
         Self {
             rate_hz,
@@ -41,6 +43,7 @@ impl FoxshaperFrameParams {
             mix,
             trim_gain,
             output_gain,
+            custom_curve,
         }
     }
 }
@@ -86,7 +89,11 @@ impl FoxshaperProcessor {
     #[inline]
     fn target_gain_for_phase(&self, phase: f32, params: FoxshaperFrameParams) -> f32 {
         let shaper_phase = lfo::wrap_unit_phase(phase + params.phase_offset);
-        let curve = evaluate_shape(shaper_phase, params.shape_preset, params.shape);
+        let curve = if params.shape_preset == ShapePreset::Custom {
+            params.custom_curve.evaluate(shaper_phase)
+        } else {
+            evaluate_shape(shaper_phase, params.shape_preset, params.shape)
+        };
         let depth_curve = lerp(1.0, curve, params.depth.clamp(0.0, 1.0));
         volume_curve_to_gain(depth_curve)
     }
@@ -248,6 +255,7 @@ mod tests {
             mix,
             1.0,
             1.0,
+            DEFAULT_VOLUME_CURVE,
         )
     }
 
@@ -316,6 +324,8 @@ mod tests {
         assert_close(evaluate_shape(0.5, ShapePreset::Sine, 0.5), 0.0);
         assert_close(evaluate_shape(0.0, ShapePreset::Triangle, 0.5), 1.0);
         assert_close(evaluate_shape(0.5, ShapePreset::Triangle, 0.5), 0.0);
+        assert_close(evaluate_shape(0.0, ShapePreset::Custom, 0.5), 0.0);
+        assert_close(evaluate_shape(0.5, ShapePreset::Custom, 0.5), 1.0);
     }
 
     #[test]

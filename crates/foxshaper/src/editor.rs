@@ -6,6 +6,8 @@ use vizia_plug::vizia::vg;
 use vizia_plug::widgets::param_base::ParamWidgetBase;
 use vizia_plug::{create_vizia_editor, ViziaState, ViziaTheming};
 
+use crate::curve::{CurvePoint, PointWeight};
+use crate::params::ShapePreset;
 use crate::processor::evaluate_shape;
 use crate::FoxshaperParams;
 
@@ -75,6 +77,7 @@ fn knob_cell<P: nih_plug::params::Param + 'static>(
 
 struct WavePreview {
     params: Arc<FoxshaperParams>,
+    dragging_point: Option<usize>,
 }
 
 impl WavePreview {
@@ -85,21 +88,85 @@ impl WavePreview {
         let phase_signal = ParamWidgetBase::new(cx, &params.phase_offset).unmodulated_signal(cx);
         let depth_signal = ParamWidgetBase::new(cx, &params.depth).unmodulated_signal(cx);
 
-        Self { params }
-            .build(cx, |_| {})
-            .class("wave-preview")
-            .width(Pixels(640.0))
-            .height(Pixels(120.0))
-            .bind(shape_preset_signal, |mut h| h.needs_redraw())
-            .bind(shape_signal, |mut h| h.needs_redraw())
-            .bind(phase_signal, |mut h| h.needs_redraw())
-            .bind(depth_signal, |mut h| h.needs_redraw())
+        Self {
+            params,
+            dragging_point: None,
+        }
+        .build(cx, |_| {})
+        .class("wave-preview")
+        .width(Pixels(640.0))
+        .height(Pixels(120.0))
+        .bind(shape_preset_signal, |mut h| h.needs_redraw())
+        .bind(shape_signal, |mut h| h.needs_redraw())
+        .bind(phase_signal, |mut h| h.needs_redraw())
+        .bind(depth_signal, |mut h| h.needs_redraw())
     }
 }
 
 impl View for WavePreview {
     fn element(&self) -> Option<&'static str> {
         Some("wave-preview")
+    }
+
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|window_event, meta| match window_event {
+            WindowEvent::MouseDown(MouseButton::Left) => {
+                let (phase, value) =
+                    mouse_to_curve_position(cx.bounds(), cx.mouse().cursor_x, cx.mouse().cursor_y);
+                let curve = self.params.custom_curve.snapshot();
+                let nearest = self.params.custom_curve.nearest_point_index(phase, value);
+                let selected = nearest.filter(|idx| {
+                    let point = curve.points()[*idx];
+                    point_distance(point, phase, value) <= 0.01
+                });
+
+                self.dragging_point = match selected {
+                    Some(index) => Some(index),
+                    None => self.params.custom_curve.insert_point(CurvePoint::new(
+                        phase,
+                        value,
+                        PointWeight::Soft,
+                    )),
+                };
+
+                cx.capture();
+                cx.focus();
+                cx.set_active(true);
+                cx.needs_redraw();
+                meta.consume();
+            }
+            WindowEvent::MouseDoubleClick(MouseButton::Left)
+            | WindowEvent::MouseDown(MouseButton::Right) => {
+                let (phase, value) =
+                    mouse_to_curve_position(cx.bounds(), cx.mouse().cursor_x, cx.mouse().cursor_y);
+                if let Some(index) = self.params.custom_curve.nearest_point_index(phase, value) {
+                    self.params.custom_curve.remove_point(index);
+                    self.dragging_point = None;
+                    cx.needs_redraw();
+                    meta.consume();
+                }
+            }
+            WindowEvent::MouseMove(x, y) => {
+                if let Some(index) = self.dragging_point {
+                    let (phase, value) = mouse_to_curve_position(cx.bounds(), *x, *y);
+                    self.params
+                        .custom_curve
+                        .set_point(index, CurvePoint::new(phase, value, PointWeight::Soft));
+                    cx.needs_redraw();
+                    meta.consume();
+                }
+            }
+            WindowEvent::MouseUp(MouseButton::Left) => {
+                if self.dragging_point.is_some() {
+                    self.dragging_point = None;
+                    cx.release();
+                    cx.set_active(false);
+                    cx.needs_redraw();
+                    meta.consume();
+                }
+            }
+            _ => {}
+        });
     }
 
     fn draw(&self, cx: &mut DrawContext, canvas: &Canvas) {
@@ -129,12 +196,17 @@ impl View for WavePreview {
         let shape = self.params.shape.value();
         let phase_offset = self.params.phase_offset.value();
         let depth = self.params.depth.value().clamp(0.0, 1.0);
+        let custom_curve = self.params.custom_curve.snapshot();
 
         let mut curve = vg::PathBuilder::new();
         let segments = 96;
         for i in 0..=segments {
             let t = i as f32 / segments as f32;
-            let raw = evaluate_shape(t + phase_offset, preset, shape);
+            let raw = if preset == ShapePreset::Custom {
+                custom_curve.evaluate(t + phase_offset)
+            } else {
+                evaluate_shape(t + phase_offset, preset, shape)
+            };
             let value = 1.0 - (1.0 - raw) * depth;
             let x = left + t * width;
             let y = bottom - value * height;
@@ -153,5 +225,41 @@ impl View for WavePreview {
         curve_paint.set_stroke_join(vg::PaintJoin::Round);
         curve_paint.set_anti_alias(true);
         canvas.draw_path(&curve.snapshot(), &curve_paint);
+
+        if preset == ShapePreset::Custom {
+            let mut point_paint = vg::Paint::default();
+            point_paint.set_color(vg::Color::from_argb(255, 110, 168, 254));
+            point_paint.set_style(vg::PaintStyle::Fill);
+            point_paint.set_anti_alias(true);
+
+            for point in custom_curve.points() {
+                let x = left + point.phase * width;
+                let y = bottom - point.value * height;
+                let mut point_path = vg::PathBuilder::new();
+                point_path.add_circle((x, y), 4.5, None);
+                canvas.draw_path(&point_path.snapshot(), &point_paint);
+            }
+        }
     }
+}
+
+fn mouse_to_curve_position(bounds: BoundingBox, x: f32, y: f32) -> (f32, f32) {
+    let left = bounds.x + 12.0;
+    let right = bounds.x + bounds.w - 12.0;
+    let top = bounds.y + 12.0;
+    let bottom = bounds.y + bounds.h - 12.0;
+    let width = (right - left).max(1.0);
+    let height = (bottom - top).max(1.0);
+
+    let phase = ((x - left) / width).clamp(0.0, 1.0);
+    let value = (1.0 - ((y - top) / height)).clamp(0.0, 1.0);
+    (phase, value)
+}
+
+fn point_distance(point: CurvePoint, phase: f32, value: f32) -> f32 {
+    let phase_distance = (point.phase - phase)
+        .abs()
+        .min(1.0 - (point.phase - phase).abs());
+    let value_distance = (point.value - value).abs();
+    phase_distance * phase_distance + value_distance * value_distance
 }
