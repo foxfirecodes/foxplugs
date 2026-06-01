@@ -92,6 +92,8 @@ pub enum ShapePreset {
     Sine,
     #[id = "triangle"]
     Triangle,
+    #[id = "custom"]
+    Custom,
 }
 
 #[derive(Params)]

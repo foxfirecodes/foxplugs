@@ -1,3 +1,4 @@
+use crate::curve::DEFAULT_VOLUME_CURVE;
 use crate::params::{ShapePreset, SyncLength, SyncRhythm};
 use foxplugs_dsp::{dry_wet, lerp, lfo, STEREO_CHANNELS};
 
@@ -173,6 +174,7 @@ pub(crate) fn evaluate_shape(phase: f32, preset: ShapePreset, shape: f32) -> f32
         ShapePreset::Gate => gate_curve(phase, shape),
         ShapePreset::Sine => 1.0 - lfo::unipolar_sine(phase),
         ShapePreset::Triangle => 1.0 - lfo::skewed_triangle(phase, skew_to_peak(shape)),
+        ShapePreset::Custom => DEFAULT_VOLUME_CURVE.evaluate(phase),
     }
     .clamp(0.0, 1.0)
 }

@@ -1,6 +1,7 @@
 use nih_plug::prelude::*;
 use std::sync::Arc;
 
+mod curve;
 #[cfg(feature = "gui")]
 mod editor;
 mod params;
