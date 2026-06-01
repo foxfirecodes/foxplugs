@@ -82,6 +82,8 @@ pub enum TriggerMode {
     Sync,
     #[id = "midi"]
     MIDI,
+    #[id = "audio"]
+    Audio,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
@@ -143,6 +145,9 @@ pub struct FoxshaperParams {
     #[id = "end_marker"]
     pub end_marker: FloatParam,
 
+    #[id = "audio_threshold"]
+    pub audio_threshold: FloatParam,
+
     #[id = "depth"]
     pub depth: FloatParam,
 
@@ -184,6 +189,7 @@ impl Default for FoxshaperParams {
             loop_mode: EnumParam::new("Loop", LoopMode::Loop),
             midi_switch: BoolParam::new("MIDI Switch", false),
             end_marker: params::percentage_param("End", 1.0),
+            audio_threshold: params::gain_db_param("Audio Thresh", -12.0, -60.0, 0.0),
             depth: params::percentage_param("Depth", 1.0),
             shape_preset: EnumParam::new("Wave", ShapePreset::Sidechain),
             shape: params::percentage_param("Shape", 0.5),

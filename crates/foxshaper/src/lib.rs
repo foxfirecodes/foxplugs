@@ -11,13 +11,15 @@ pub use params::FoxshaperParams;
 use params::{LfoMode, LoopMode, TriggerMode};
 use processor::{
     advance_beats_for_sample, midi_note_is_trigger, midi_note_to_wave_slot, sync_loop_beats,
-    sync_phase_from_beats, sync_rate_hz, FoxshaperFrameParams, FoxshaperProcessor,
+    sync_phase_from_beats, sync_rate_hz, AudioTriggerDetector, FoxshaperFrameParams,
+    FoxshaperProcessor,
 };
 
 #[derive(Default)]
 pub struct Foxshaper {
     params: Arc<FoxshaperParams>,
     processor: FoxshaperProcessor,
+    audio_trigger: AudioTriggerDetector,
 }
 
 impl Plugin for Foxshaper {
@@ -65,6 +67,7 @@ impl Plugin for Foxshaper {
 
     fn reset(&mut self) {
         self.processor.reset();
+        self.audio_trigger.reset();
     }
 
     fn process(
@@ -85,12 +88,17 @@ impl Plugin for Foxshaper {
         let use_beat_sync = self.params.lfo_mode.value() == LfoMode::Beats;
         let trigger_mode = self.params.trigger_mode.value();
         let use_midi_trigger = trigger_mode == TriggerMode::MIDI;
+        let use_audio_trigger = trigger_mode == TriggerMode::Audio;
         let use_one_shot = self.params.loop_mode.value() == LoopMode::OneShot;
         let midi_switch = self.params.midi_switch.value();
         let end_marker = self.params.end_marker.value();
         let sample_rate = transport.sample_rate;
         let start_pos_beats = transport.pos_beats;
-        let mut next_event = context.next_event();
+        let mut next_event = if use_midi_trigger {
+            context.next_event()
+        } else {
+            None
+        };
 
         for (sample_idx, mut channel_samples) in buffer.iter_samples().enumerate() {
             if use_midi_trigger {
@@ -117,6 +125,21 @@ impl Plugin for Foxshaper {
                 }
             }
 
+            if use_audio_trigger {
+                let input_level = channel_samples
+                    .iter_mut()
+                    .take(FoxshaperProcessor::CHANNELS)
+                    .map(|sample| sample.abs())
+                    .fold(0.0_f32, f32::max);
+                if self.audio_trigger.detect(
+                    input_level,
+                    self.params.audio_threshold.smoothed.next(),
+                    sample_rate,
+                ) {
+                    self.processor.trigger();
+                }
+            }
+
             let rate_hz = if use_beat_sync {
                 sync_rate
             } else {
@@ -140,13 +163,13 @@ impl Plugin for Foxshaper {
                 self.params.custom_curve.snapshot(),
             );
 
-            if use_midi_trigger && use_one_shot {
+            if (use_midi_trigger || use_audio_trigger) && use_one_shot {
                 self.processor.process_frame_one_shot(
                     channel_samples.iter_mut(),
                     frame_params,
                     end_marker,
                 );
-            } else if use_beat_sync && !use_midi_trigger {
+            } else if use_beat_sync && !use_midi_trigger && !use_audio_trigger {
                 if let Some(start_pos_beats) = start_pos_beats {
                     let pos_beats = start_pos_beats
                         + advance_beats_for_sample(sample_idx, tempo_bpm, sample_rate);

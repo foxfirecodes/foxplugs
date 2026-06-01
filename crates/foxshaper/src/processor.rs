@@ -4,6 +4,7 @@ use foxplugs_dsp::{dry_wet, lerp, lfo, STEREO_CHANNELS};
 
 const DEFAULT_SAMPLE_RATE: f32 = 44_100.0;
 const MAX_SMOOTHING_MS: f32 = 50.0;
+const AUDIO_TRIGGER_COOLDOWN_MS: f32 = 10.0;
 
 #[derive(Clone, Copy, Debug)]
 pub struct FoxshaperFrameParams {
@@ -56,6 +57,37 @@ pub struct FoxshaperProcessor {
     gain_initialized: bool,
     one_shot_active: bool,
     active_wave_slot: usize,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct AudioTriggerDetector {
+    was_above_threshold: bool,
+    cooldown_remaining: u32,
+}
+
+impl AudioTriggerDetector {
+    pub fn reset(&mut self) {
+        self.was_above_threshold = false;
+        self.cooldown_remaining = 0;
+    }
+
+    pub fn detect(&mut self, input_level: f32, threshold: f32, sample_rate: f32) -> bool {
+        if self.cooldown_remaining > 0 {
+            self.cooldown_remaining -= 1;
+        }
+
+        let threshold = threshold.max(0.0);
+        let above = input_level >= threshold;
+        let triggered = above && !self.was_above_threshold && self.cooldown_remaining == 0;
+        self.was_above_threshold = above;
+
+        if triggered {
+            self.cooldown_remaining =
+                (AUDIO_TRIGGER_COOLDOWN_MS * 0.001 * sample_rate.max(1.0)).round() as u32;
+        }
+
+        triggered
+    }
 }
 
 impl Default for FoxshaperProcessor {
@@ -344,6 +376,31 @@ mod tests {
         assert_close(volume_curve_to_gain(0.0), 0.0);
         assert_close(volume_curve_to_gain(-1.0), 0.0);
         assert_close(volume_curve_to_gain(2.0), 1.0);
+    }
+
+    #[test]
+    fn audio_trigger_detector_fires_on_threshold_crossing_with_cooldown() {
+        let mut detector = AudioTriggerDetector::default();
+
+        assert!(!detector.detect(0.1, 0.5, 1_000.0));
+        assert!(detector.detect(0.6, 0.5, 1_000.0));
+        assert!(!detector.detect(0.7, 0.5, 1_000.0));
+        assert!(!detector.detect(0.1, 0.5, 1_000.0));
+
+        for _ in 0..10 {
+            detector.detect(0.1, 0.5, 1_000.0);
+        }
+
+        assert!(detector.detect(0.6, 0.5, 1_000.0));
+    }
+
+    #[test]
+    fn audio_trigger_detector_resets_state() {
+        let mut detector = AudioTriggerDetector::default();
+
+        assert!(detector.detect(0.6, 0.5, 1_000.0));
+        detector.reset();
+        assert!(detector.detect(0.6, 0.5, 1_000.0));
     }
 
     #[test]

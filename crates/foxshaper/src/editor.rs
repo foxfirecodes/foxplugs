@@ -37,6 +37,7 @@ pub(crate) fn create(
                     knob_cell(cx, &params.trigger_mode, None);
                     knob_cell(cx, &params.loop_mode, None);
                     knob_cell(cx, &params.midi_switch, None);
+                    knob_cell(cx, &params.audio_threshold, Some(0.01));
                 })
                 .class("knob-row");
 
