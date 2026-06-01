@@ -125,6 +125,28 @@ mod tests {
     }
 
     #[test]
+    fn low_bit_depth_level_compensation_controls_boost_but_keeps_shape_change() {
+        let mut processor = Bitcrusher::default();
+        let params = BitcrusherFrameParams::from_plain_values(2.0, 1.0, 1.0, 1.0);
+        let mut input_abs_sum = 0.0;
+        let mut output_abs_sum = 0.0;
+        let mut difference_sum = 0.0;
+
+        for n in 0..1000 {
+            let input = (n as f32 * 0.1).sin() * 0.02;
+            let mut frame = [input, -input];
+            processor.process_frame(&mut frame, params);
+
+            input_abs_sum += input.abs() * 2.0;
+            output_abs_sum += frame[0].abs() + frame[1].abs();
+            difference_sum += (frame[0] - input).abs() + (frame[1] + input).abs();
+        }
+
+        assert!(output_abs_sum <= input_abs_sum * 1.2);
+        assert!(difference_sum > input_abs_sum * 0.2);
+    }
+
+    #[test]
     fn reset_captures_first_frame_after_reset() {
         let mut processor = Bitcrusher::default();
         let params = BitcrusherFrameParams::from_plain_values(16.0, 4.0, 1.0, 1.0);
@@ -166,7 +188,7 @@ mod tests {
 
         processor.process_frame(&mut frame, params);
 
-        assert_close(frame[0], 0.5);
+        assert_close(frame[0], 0.3);
         assert_close(frame[1], 0.5);
         assert_close(frame[2], 0.9);
     }
