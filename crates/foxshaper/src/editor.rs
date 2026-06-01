@@ -10,7 +10,7 @@ use crate::processor::evaluate_shape;
 use crate::FoxshaperParams;
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (640, 460))
+    ViziaState::new(|| (720, 520))
 }
 
 pub(crate) fn create(
@@ -29,16 +29,23 @@ pub(crate) fn create(
 
             VStack::new(cx, |cx| {
                 HStack::new(cx, |cx| {
+                    knob_cell(cx, &params.lfo_mode, None);
+                    knob_cell(cx, &params.sync_length, None);
+                    knob_cell(cx, &params.sync_rhythm, None);
                     knob_cell(cx, &params.rate_hz, Some(0.01));
                     knob_cell(cx, &params.shape_preset, None);
-                    knob_cell(cx, &params.depth, Some(0.01));
-                    knob_cell(cx, &params.shape, Some(0.01));
                 })
                 .class("knob-row");
 
                 HStack::new(cx, |cx| {
+                    knob_cell(cx, &params.depth, Some(0.01));
+                    knob_cell(cx, &params.shape, Some(0.01));
                     knob_cell(cx, &params.phase_offset, Some(0.01));
                     knob_cell(cx, &params.smooth, Some(0.01));
+                })
+                .class("knob-row");
+
+                HStack::new(cx, |cx| {
                     knob_cell(cx, &params.mix, Some(0.01));
                     // Gain parameters are stored as linear gain, so snapping remains in linear units.
                     knob_cell(cx, &params.trim, Some(0.05));
@@ -81,7 +88,7 @@ impl WavePreview {
         Self { params }
             .build(cx, |_| {})
             .class("wave-preview")
-            .width(Pixels(560.0))
+            .width(Pixels(640.0))
             .height(Pixels(120.0))
             .bind(shape_preset_signal, |mut h| h.needs_redraw())
             .bind(shape_signal, |mut h| h.needs_redraw())

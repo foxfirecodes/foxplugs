@@ -1,4 +1,4 @@
-use crate::params::ShapePreset;
+use crate::params::{ShapePreset, SyncLength, SyncRhythm};
 use foxplugs_dsp::{dry_wet, lerp, lfo, STEREO_CHANNELS};
 
 const DEFAULT_SAMPLE_RATE: f32 = 44_100.0;
@@ -83,8 +83,8 @@ impl FoxshaperProcessor {
     }
 
     #[inline]
-    fn target_gain_for_phase(&self, params: FoxshaperFrameParams) -> f32 {
-        let shaper_phase = lfo::wrap_unit_phase(self.phase + params.phase_offset);
+    fn target_gain_for_phase(&self, phase: f32, params: FoxshaperFrameParams) -> f32 {
+        let shaper_phase = lfo::wrap_unit_phase(phase + params.phase_offset);
         let curve = evaluate_shape(shaper_phase, params.shape_preset, params.shape);
         let depth_curve = lerp(1.0, curve, params.depth.clamp(0.0, 1.0));
         volume_curve_to_gain(depth_curve)
@@ -112,7 +112,18 @@ impl FoxshaperProcessor {
         samples: impl IntoIterator<Item = &'a mut f32>,
         params: FoxshaperFrameParams,
     ) {
-        let target_gain = self.target_gain_for_phase(params);
+        self.process_frame_at_phase(samples, params, self.phase);
+        self.phase = lfo::advance_phase(self.phase, params.rate_hz, self.sample_rate);
+    }
+
+    #[inline]
+    pub fn process_frame_at_phase<'a>(
+        &mut self,
+        samples: impl IntoIterator<Item = &'a mut f32>,
+        params: FoxshaperFrameParams,
+        phase: f32,
+    ) {
+        let target_gain = self.target_gain_for_phase(phase, params);
         let shaped_gain = self.next_gain(target_gain, params.smooth);
         let post_gain = params.trim_gain * params.output_gain;
 
@@ -121,9 +132,33 @@ impl FoxshaperProcessor {
             let wet = dry * shaped_gain;
             *sample = dry_wet(dry, wet, params.mix) * post_gain;
         }
-
-        self.phase = lfo::advance_phase(self.phase, params.rate_hz, self.sample_rate);
     }
+}
+
+#[inline]
+pub(crate) fn sync_loop_beats(length: SyncLength, rhythm: SyncRhythm, beats_per_bar: f32) -> f32 {
+    let beats_per_bar = beats_per_bar.max(1.0);
+    (length.beats(beats_per_bar) * rhythm.multiplier()).max(0.001)
+}
+
+#[inline]
+pub(crate) fn sync_rate_hz(tempo_bpm: f32, loop_beats: f32) -> f32 {
+    (tempo_bpm.max(1.0) / 60.0) / loop_beats.max(0.001)
+}
+
+#[inline]
+pub(crate) fn sync_phase_from_beats(pos_beats: f64, loop_beats: f32) -> f32 {
+    lfo::wrap_unit_phase((pos_beats / loop_beats.max(0.001) as f64) as f32)
+}
+
+#[inline]
+pub(crate) fn advance_beats_for_sample(
+    sample_index: usize,
+    tempo_bpm: f32,
+    sample_rate: f32,
+) -> f64 {
+    let beats_per_sample = tempo_bpm.max(1.0) as f64 / (60.0 * sample_rate.max(1.0) as f64);
+    sample_index as f64 * beats_per_sample
 }
 
 #[inline]
@@ -226,6 +261,45 @@ mod tests {
         assert_close(volume_curve_to_gain(0.0), 0.0);
         assert_close(volume_curve_to_gain(-1.0), 0.0);
         assert_close(volume_curve_to_gain(2.0), 1.0);
+    }
+
+    #[test]
+    fn sync_timing_converts_musical_lengths_to_beats_and_hz() {
+        let one_bar = sync_loop_beats(SyncLength::OneBar, SyncRhythm::Straight, 4.0);
+        let dotted_eighth = sync_loop_beats(SyncLength::Eighth, SyncRhythm::Dotted, 4.0);
+        let quarter_triplet = sync_loop_beats(SyncLength::Quarter, SyncRhythm::Triplet, 4.0);
+
+        assert_close(one_bar, 4.0);
+        assert_close(dotted_eighth, 0.75);
+        assert_close(quarter_triplet, 2.0 / 3.0);
+        assert_close(sync_rate_hz(120.0, one_bar), 0.5);
+    }
+
+    #[test]
+    fn sync_phase_uses_absolute_beat_position() {
+        assert_close(sync_phase_from_beats(0.0, 4.0), 0.0);
+        assert_close(sync_phase_from_beats(1.0, 4.0), 0.25);
+        assert_close(sync_phase_from_beats(4.0, 4.0), 0.0);
+        assert_close(sync_phase_from_beats(5.0, 4.0), 0.25);
+        assert_close(
+            advance_beats_for_sample(24_000, 120.0, 48_000.0) as f32,
+            1.0,
+        );
+    }
+
+    #[test]
+    fn process_frame_at_phase_does_not_advance_free_running_phase() {
+        let mut processor = FoxshaperProcessor::default();
+        let mut frame = [1.0, 1.0];
+
+        processor.process_frame_at_phase(
+            &mut frame,
+            params(ShapePreset::Sidechain, 1.0, 0.0, 1.0),
+            0.0,
+        );
+
+        assert_close(processor.current_phase(), 0.0);
+        assert_close(frame[0], 0.0);
     }
 
     #[test]

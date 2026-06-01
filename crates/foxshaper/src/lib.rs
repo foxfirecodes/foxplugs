@@ -7,7 +7,11 @@ mod params;
 mod processor;
 
 pub use params::FoxshaperParams;
-use processor::{FoxshaperFrameParams, FoxshaperProcessor};
+use params::LfoMode;
+use processor::{
+    advance_beats_for_sample, sync_loop_beats, sync_phase_from_beats, sync_rate_hz,
+    FoxshaperFrameParams, FoxshaperProcessor,
+};
 
 #[derive(Default)]
 pub struct Foxshaper {
@@ -66,11 +70,29 @@ impl Plugin for Foxshaper {
         &mut self,
         buffer: &mut Buffer,
         _aux: &mut AuxiliaryBuffers,
-        _context: &mut impl ProcessContext<Self>,
+        context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        for mut channel_samples in buffer.iter_samples() {
+        let transport = context.transport();
+        let tempo_bpm = transport.tempo.unwrap_or(120.0) as f32;
+        let beats_per_bar = transport.time_sig_numerator.unwrap_or(4).max(1) as f32;
+        let loop_beats = sync_loop_beats(
+            self.params.sync_length.value(),
+            self.params.sync_rhythm.value(),
+            beats_per_bar,
+        );
+        let sync_rate = sync_rate_hz(tempo_bpm, loop_beats);
+        let use_beat_sync = self.params.lfo_mode.value() == LfoMode::Beats;
+        let sample_rate = transport.sample_rate;
+        let start_pos_beats = transport.pos_beats;
+
+        for (sample_idx, mut channel_samples) in buffer.iter_samples().enumerate() {
+            let rate_hz = if use_beat_sync {
+                sync_rate
+            } else {
+                self.params.rate_hz.smoothed.next()
+            };
             let frame_params = FoxshaperFrameParams::from_plain_values(
-                self.params.rate_hz.smoothed.next(),
+                rate_hz,
                 self.params.depth.smoothed.next(),
                 self.params.shape_preset.value(),
                 self.params.shape.smoothed.next(),
@@ -81,8 +103,24 @@ impl Plugin for Foxshaper {
                 self.params.output_gain.smoothed.next(),
             );
 
-            self.processor
-                .process_frame(channel_samples.iter_mut(), frame_params);
+            if use_beat_sync {
+                if let Some(start_pos_beats) = start_pos_beats {
+                    let pos_beats = start_pos_beats
+                        + advance_beats_for_sample(sample_idx, tempo_bpm, sample_rate);
+                    let phase = sync_phase_from_beats(pos_beats, loop_beats);
+                    self.processor.process_frame_at_phase(
+                        channel_samples.iter_mut(),
+                        frame_params,
+                        phase,
+                    );
+                } else {
+                    self.processor
+                        .process_frame(channel_samples.iter_mut(), frame_params);
+                }
+            } else {
+                self.processor
+                    .process_frame(channel_samples.iter_mut(), frame_params);
+            }
         }
 
         ProcessStatus::Normal

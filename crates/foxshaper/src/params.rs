@@ -10,6 +10,73 @@ const RATE_MIN_HZ: f32 = 0.05;
 const RATE_MAX_HZ: f32 = 20.0;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
+pub enum LfoMode {
+    #[id = "hz"]
+    Hz,
+    #[id = "beats"]
+    Beats,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
+pub enum SyncLength {
+    #[id = "1-16"]
+    #[name = "1/16"]
+    Sixteenth,
+    #[id = "1-8"]
+    #[name = "1/8"]
+    Eighth,
+    #[id = "1-4"]
+    #[name = "1/4"]
+    Quarter,
+    #[id = "1-2"]
+    #[name = "1/2"]
+    Half,
+    #[id = "1-bar"]
+    #[name = "1 Bar"]
+    OneBar,
+    #[id = "2-bars"]
+    #[name = "2 Bars"]
+    TwoBars,
+    #[id = "4-bars"]
+    #[name = "4 Bars"]
+    FourBars,
+}
+
+impl SyncLength {
+    pub(crate) fn beats(self, beats_per_bar: f32) -> f32 {
+        match self {
+            Self::Sixteenth => 0.25,
+            Self::Eighth => 0.5,
+            Self::Quarter => 1.0,
+            Self::Half => 2.0,
+            Self::OneBar => beats_per_bar,
+            Self::TwoBars => beats_per_bar * 2.0,
+            Self::FourBars => beats_per_bar * 4.0,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
+pub enum SyncRhythm {
+    #[id = "straight"]
+    Straight,
+    #[id = "dotted"]
+    Dotted,
+    #[id = "triplet"]
+    Triplet,
+}
+
+impl SyncRhythm {
+    pub(crate) fn multiplier(self) -> f32 {
+        match self {
+            Self::Straight => 1.0,
+            Self::Dotted => 1.5,
+            Self::Triplet => 2.0 / 3.0,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
 pub enum ShapePreset {
     #[id = "sidechain"]
     Sidechain,
@@ -33,8 +100,17 @@ pub struct FoxshaperParams {
     #[persist = "editor-state"]
     pub(crate) editor_state: Arc<ViziaState>,
 
+    #[id = "lfo_mode"]
+    pub lfo_mode: EnumParam<LfoMode>,
+
     #[id = "rate_hz"]
     pub rate_hz: FloatParam,
+
+    #[id = "sync_length"]
+    pub sync_length: EnumParam<SyncLength>,
+
+    #[id = "sync_rhythm"]
+    pub sync_rhythm: EnumParam<SyncRhythm>,
 
     #[id = "depth"]
     pub depth: FloatParam,
@@ -67,7 +143,10 @@ impl Default for FoxshaperParams {
             #[cfg(feature = "gui")]
             editor_state: crate::editor::default_state(),
 
+            lfo_mode: EnumParam::new("Mode", LfoMode::Beats),
             rate_hz: params::hz_param("Rate", 1.0, RATE_MIN_HZ, RATE_MAX_HZ),
+            sync_length: EnumParam::new("Length", SyncLength::OneBar),
+            sync_rhythm: EnumParam::new("Feel", SyncRhythm::Straight),
             depth: params::percentage_param("Depth", 1.0),
             shape_preset: EnumParam::new("Wave", ShapePreset::Sidechain),
             shape: params::percentage_param("Shape", 0.5),
