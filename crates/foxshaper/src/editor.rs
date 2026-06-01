@@ -36,6 +36,7 @@ pub(crate) fn create(
                     knob_cell(cx, &params.sync_rhythm, None);
                     knob_cell(cx, &params.trigger_mode, None);
                     knob_cell(cx, &params.loop_mode, None);
+                    knob_cell(cx, &params.midi_switch, None);
                 })
                 .class("knob-row");
 

@@ -10,8 +10,8 @@ mod processor;
 pub use params::FoxshaperParams;
 use params::{LfoMode, LoopMode, TriggerMode};
 use processor::{
-    advance_beats_for_sample, sync_loop_beats, sync_phase_from_beats, sync_rate_hz,
-    FoxshaperFrameParams, FoxshaperProcessor,
+    advance_beats_for_sample, midi_note_is_trigger, midi_note_to_wave_slot, sync_loop_beats,
+    sync_phase_from_beats, sync_rate_hz, FoxshaperFrameParams, FoxshaperProcessor,
 };
 
 #[derive(Default)]
@@ -86,6 +86,7 @@ impl Plugin for Foxshaper {
         let trigger_mode = self.params.trigger_mode.value();
         let use_midi_trigger = trigger_mode == TriggerMode::MIDI;
         let use_one_shot = self.params.loop_mode.value() == LoopMode::OneShot;
+        let midi_switch = self.params.midi_switch.value();
         let end_marker = self.params.end_marker.value();
         let sample_rate = transport.sample_rate;
         let start_pos_beats = transport.pos_beats;
@@ -98,9 +99,17 @@ impl Plugin for Foxshaper {
                         break;
                     }
 
-                    if let NoteEvent::NoteOn { velocity, .. } = event {
+                    if let NoteEvent::NoteOn { note, velocity, .. } = event {
                         if velocity > 0.0 {
-                            self.processor.trigger();
+                            if midi_switch {
+                                if let Some(slot) = midi_note_to_wave_slot(note) {
+                                    self.processor.set_wave_slot(slot);
+                                } else if midi_note_is_trigger(note) {
+                                    self.processor.trigger();
+                                }
+                            } else {
+                                self.processor.trigger();
+                            }
                         }
                     }
 
@@ -113,10 +122,15 @@ impl Plugin for Foxshaper {
             } else {
                 self.params.rate_hz.smoothed.next()
             };
+            let shape_preset = if midi_switch {
+                self.processor.active_wave_shape()
+            } else {
+                self.params.shape_preset.value()
+            };
             let frame_params = FoxshaperFrameParams::from_plain_values(
                 rate_hz,
                 self.params.depth.smoothed.next(),
-                self.params.shape_preset.value(),
+                shape_preset,
                 self.params.shape.smoothed.next(),
                 self.params.phase_offset.smoothed.next(),
                 self.params.smooth.smoothed.next(),

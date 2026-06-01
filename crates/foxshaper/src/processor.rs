@@ -55,6 +55,7 @@ pub struct FoxshaperProcessor {
     smoothed_gain: f32,
     gain_initialized: bool,
     one_shot_active: bool,
+    active_wave_slot: usize,
 }
 
 impl Default for FoxshaperProcessor {
@@ -65,6 +66,7 @@ impl Default for FoxshaperProcessor {
             smoothed_gain: 1.0,
             gain_initialized: false,
             one_shot_active: false,
+            active_wave_slot: 0,
         }
     }
 }
@@ -81,6 +83,15 @@ impl FoxshaperProcessor {
         self.smoothed_gain = 1.0;
         self.gain_initialized = false;
         self.one_shot_active = false;
+        self.active_wave_slot = 0;
+    }
+
+    pub fn set_wave_slot(&mut self, slot: usize) {
+        self.active_wave_slot = slot.min(8);
+    }
+
+    pub fn active_wave_shape(&self) -> ShapePreset {
+        shape_for_wave_slot(self.active_wave_slot)
     }
 
     pub fn trigger(&mut self) {
@@ -173,6 +184,36 @@ impl FoxshaperProcessor {
             *sample = dry_wet(dry, wet, params.mix) * post_gain;
         }
     }
+}
+
+#[inline]
+pub(crate) fn shape_for_wave_slot(slot: usize) -> ShapePreset {
+    match slot.min(8) {
+        0 => ShapePreset::Sidechain,
+        1 => ShapePreset::Gate,
+        2 => ShapePreset::Sine,
+        3 => ShapePreset::Triangle,
+        4 => ShapePreset::RampUp,
+        5 => ShapePreset::RampDown,
+        6 => ShapePreset::Custom,
+        7 => ShapePreset::Sidechain,
+        _ => ShapePreset::Gate,
+    }
+}
+
+#[inline]
+pub(crate) fn midi_note_to_wave_slot(note: u8) -> Option<usize> {
+    let semitone = note % 12;
+    if (1..=9).contains(&semitone) {
+        Some((semitone - 1) as usize)
+    } else {
+        None
+    }
+}
+
+#[inline]
+pub(crate) fn midi_note_is_trigger(note: u8) -> bool {
+    note % 12 == 0
 }
 
 #[inline]
@@ -303,6 +344,29 @@ mod tests {
         assert_close(volume_curve_to_gain(0.0), 0.0);
         assert_close(volume_curve_to_gain(-1.0), 0.0);
         assert_close(volume_curve_to_gain(2.0), 1.0);
+    }
+
+    #[test]
+    fn midi_notes_map_to_trigger_and_wave_slots() {
+        assert!(midi_note_is_trigger(60));
+        assert!(midi_note_is_trigger(72));
+        assert_eq!(midi_note_to_wave_slot(61), Some(0));
+        assert_eq!(midi_note_to_wave_slot(69), Some(8));
+        assert_eq!(midi_note_to_wave_slot(70), None);
+        assert_eq!(shape_for_wave_slot(0), ShapePreset::Sidechain);
+        assert_eq!(shape_for_wave_slot(4), ShapePreset::RampUp);
+        assert_eq!(shape_for_wave_slot(6), ShapePreset::Custom);
+    }
+
+    #[test]
+    fn processor_tracks_active_midi_wave_slot() {
+        let mut processor = FoxshaperProcessor::default();
+
+        processor.set_wave_slot(4);
+        assert_eq!(processor.active_wave_shape(), ShapePreset::RampUp);
+
+        processor.set_wave_slot(99);
+        assert_eq!(processor.active_wave_shape(), ShapePreset::Gate);
     }
 
     #[test]

@@ -137,6 +137,9 @@ pub struct FoxshaperParams {
     #[id = "loop_mode"]
     pub loop_mode: EnumParam<LoopMode>,
 
+    #[id = "midi_switch"]
+    pub midi_switch: BoolParam,
+
     #[id = "end_marker"]
     pub end_marker: FloatParam,
 
@@ -179,6 +182,7 @@ impl Default for FoxshaperParams {
             sync_rhythm: EnumParam::new("Feel", SyncRhythm::Straight),
             trigger_mode: EnumParam::new("Trigger", TriggerMode::Sync),
             loop_mode: EnumParam::new("Loop", LoopMode::Loop),
+            midi_switch: BoolParam::new("MIDI Switch", false),
             end_marker: params::percentage_param("End", 1.0),
             depth: params::percentage_param("Depth", 1.0),
             shape_preset: EnumParam::new("Wave", ShapePreset::Sidechain),
