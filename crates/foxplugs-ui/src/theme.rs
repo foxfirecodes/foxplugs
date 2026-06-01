@@ -24,6 +24,14 @@ label.subtitle {
     alignment: center;
 }
 
+wave-preview {
+    background-color: #12101c;
+    border-color: #2a2638;
+    border-width: 1px;
+    corner-radius: 6px;
+    child-space: 8px;
+}
+
 vstack.knob-grid {
     row-between: 14px;
     child-space: 16px;

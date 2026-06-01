@@ -1,14 +1,19 @@
-use foxplugs_dsp::{dry_wet, lfo, STEREO_CHANNELS};
+use crate::params::ShapePreset;
+use foxplugs_dsp::{dry_wet, lerp, lfo, STEREO_CHANNELS};
 
 const DEFAULT_SAMPLE_RATE: f32 = 44_100.0;
+const MAX_SMOOTHING_MS: f32 = 50.0;
 
 #[derive(Clone, Copy, Debug)]
 pub struct FoxshaperFrameParams {
     pub rate_hz: f32,
     pub depth: f32,
+    pub shape_preset: ShapePreset,
     pub shape: f32,
     pub phase_offset: f32,
+    pub smooth: f32,
     pub mix: f32,
+    pub trim_gain: f32,
     pub output_gain: f32,
 }
 
@@ -17,17 +22,23 @@ impl FoxshaperFrameParams {
     pub fn from_plain_values(
         rate_hz: f32,
         depth: f32,
+        shape_preset: ShapePreset,
         shape: f32,
         phase_offset: f32,
+        smooth: f32,
         mix: f32,
+        trim_gain: f32,
         output_gain: f32,
     ) -> Self {
         Self {
             rate_hz,
             depth,
+            shape_preset,
             shape,
             phase_offset,
+            smooth,
             mix,
+            trim_gain,
             output_gain,
         }
     }
@@ -37,6 +48,8 @@ impl FoxshaperFrameParams {
 pub struct FoxshaperProcessor {
     sample_rate: f32,
     phase: f32,
+    smoothed_gain: f32,
+    gain_initialized: bool,
 }
 
 impl Default for FoxshaperProcessor {
@@ -44,6 +57,8 @@ impl Default for FoxshaperProcessor {
         Self {
             sample_rate: DEFAULT_SAMPLE_RATE,
             phase: 0.0,
+            smoothed_gain: 1.0,
+            gain_initialized: false,
         }
     }
 }
@@ -57,6 +72,8 @@ impl FoxshaperProcessor {
 
     pub fn reset(&mut self) {
         self.phase = 0.0;
+        self.smoothed_gain = 1.0;
+        self.gain_initialized = false;
     }
 
     #[cfg(test)]
@@ -66,10 +83,27 @@ impl FoxshaperProcessor {
     }
 
     #[inline]
-    fn gain_for_phase(&self, params: FoxshaperFrameParams) -> f32 {
+    fn target_gain_for_phase(&self, params: FoxshaperFrameParams) -> f32 {
         let shaper_phase = lfo::wrap_unit_phase(self.phase + params.phase_offset);
-        let envelope = lfo::skewed_triangle(shaper_phase, params.shape);
-        1.0 - params.depth.clamp(0.0, 1.0) * envelope
+        let curve = evaluate_shape(shaper_phase, params.shape_preset, params.shape);
+        let depth_curve = lerp(1.0, curve, params.depth.clamp(0.0, 1.0));
+        volume_curve_to_gain(depth_curve)
+    }
+
+    #[inline]
+    fn next_gain(&mut self, target_gain: f32, smooth: f32) -> f32 {
+        let smooth = smooth.clamp(0.0, 1.0);
+
+        if !self.gain_initialized || smooth <= 0.0 {
+            self.smoothed_gain = target_gain;
+            self.gain_initialized = true;
+            return target_gain;
+        }
+
+        let smoothing_samples = (smooth * MAX_SMOOTHING_MS * 0.001 * self.sample_rate).max(1.0);
+        let coefficient = 1.0 / smoothing_samples;
+        self.smoothed_gain += (target_gain - self.smoothed_gain) * coefficient;
+        self.smoothed_gain
     }
 
     #[inline]
@@ -78,16 +112,74 @@ impl FoxshaperProcessor {
         samples: impl IntoIterator<Item = &'a mut f32>,
         params: FoxshaperFrameParams,
     ) {
-        let gain = self.gain_for_phase(params);
+        let target_gain = self.target_gain_for_phase(params);
+        let shaped_gain = self.next_gain(target_gain, params.smooth);
+        let post_gain = params.trim_gain * params.output_gain;
 
         for sample in samples.into_iter().take(Self::CHANNELS) {
             let dry = *sample;
-            let wet = dry * gain;
-            *sample = dry_wet(dry, wet, params.mix) * params.output_gain;
+            let wet = dry * shaped_gain;
+            *sample = dry_wet(dry, wet, params.mix) * post_gain;
         }
 
         self.phase = lfo::advance_phase(self.phase, params.rate_hz, self.sample_rate);
     }
+}
+
+#[inline]
+pub(crate) fn evaluate_shape(phase: f32, preset: ShapePreset, shape: f32) -> f32 {
+    let phase = lfo::wrap_unit_phase(phase);
+    let shape = shape.clamp(0.0, 1.0);
+
+    match preset {
+        ShapePreset::Sidechain => sidechain_curve(phase, shape),
+        ShapePreset::RampUp => phase,
+        ShapePreset::RampDown => 1.0 - phase,
+        ShapePreset::Gate => gate_curve(phase, shape),
+        ShapePreset::Sine => 1.0 - lfo::unipolar_sine(phase),
+        ShapePreset::Triangle => 1.0 - lfo::skewed_triangle(phase, skew_to_peak(shape)),
+    }
+    .clamp(0.0, 1.0)
+}
+
+#[inline]
+fn sidechain_curve(phase: f32, shape: f32) -> f32 {
+    let release_end = lerp(0.08, 0.95, shape);
+    if phase >= release_end {
+        1.0
+    } else {
+        smoothstep(phase / release_end)
+    }
+}
+
+#[inline]
+fn gate_curve(phase: f32, shape: f32) -> f32 {
+    let duty = lerp(0.05, 0.95, shape);
+    if phase < duty {
+        1.0
+    } else {
+        0.0
+    }
+}
+
+#[inline]
+fn skew_to_peak(shape: f32) -> f32 {
+    lerp(0.05, 0.95, shape)
+}
+
+#[inline]
+fn smoothstep(t: f32) -> f32 {
+    let t = t.clamp(0.0, 1.0);
+    t * t * (3.0 - 2.0 * t)
+}
+
+/// Map VolumeShaper-style normalized volume to linear gain.
+///
+/// The graph is displayed as a percentage, but the useful audible mapping is in
+/// gain: 1.0 is unity, 0.5 is approximately -6 dB, and 0.0 is silence.
+#[inline]
+pub(crate) fn volume_curve_to_gain(curve: f32) -> f32 {
+    curve.clamp(0.0, 1.0)
 }
 
 #[cfg(test)]
@@ -103,8 +195,23 @@ mod tests {
         );
     }
 
-    fn params(depth: f32, phase_offset: f32, mix: f32) -> FoxshaperFrameParams {
-        FoxshaperFrameParams::from_plain_values(1.0, depth, 0.5, phase_offset, mix, 1.0)
+    fn params(
+        shape_preset: ShapePreset,
+        depth: f32,
+        phase_offset: f32,
+        mix: f32,
+    ) -> FoxshaperFrameParams {
+        FoxshaperFrameParams::from_plain_values(
+            1.0,
+            depth,
+            shape_preset,
+            0.5,
+            phase_offset,
+            0.0,
+            mix,
+            1.0,
+            1.0,
+        )
     }
 
     #[test]
@@ -113,22 +220,45 @@ mod tests {
     }
 
     #[test]
+    fn volume_curve_mapping_matches_volume_shaper_anchor_points() {
+        assert_close(volume_curve_to_gain(1.0), 1.0);
+        assert_close(volume_curve_to_gain(0.5), 0.5);
+        assert_close(volume_curve_to_gain(0.0), 0.0);
+        assert_close(volume_curve_to_gain(-1.0), 0.0);
+        assert_close(volume_curve_to_gain(2.0), 1.0);
+    }
+
+    #[test]
+    fn evaluates_shape_presets_at_known_phases() {
+        assert_close(evaluate_shape(0.0, ShapePreset::Sidechain, 0.5), 0.0);
+        assert_close(evaluate_shape(0.75, ShapePreset::Sidechain, 0.5), 1.0);
+        assert_close(evaluate_shape(0.25, ShapePreset::RampUp, 0.5), 0.25);
+        assert_close(evaluate_shape(0.25, ShapePreset::RampDown, 0.5), 0.75);
+        assert_close(evaluate_shape(0.25, ShapePreset::Gate, 0.5), 1.0);
+        assert_close(evaluate_shape(0.75, ShapePreset::Gate, 0.5), 0.0);
+        assert_close(evaluate_shape(0.0, ShapePreset::Sine, 0.5), 1.0);
+        assert_close(evaluate_shape(0.5, ShapePreset::Sine, 0.5), 0.0);
+        assert_close(evaluate_shape(0.0, ShapePreset::Triangle, 0.5), 1.0);
+        assert_close(evaluate_shape(0.5, ShapePreset::Triangle, 0.5), 0.0);
+    }
+
+    #[test]
     fn depth_zero_outputs_dry_signal() {
         let mut processor = FoxshaperProcessor::default();
         let mut frame = [0.5, -0.25];
 
-        processor.process_frame(&mut frame, params(0.0, 0.5, 1.0));
+        processor.process_frame(&mut frame, params(ShapePreset::Sidechain, 0.0, 0.0, 1.0));
 
         assert_close(frame[0], 0.5);
         assert_close(frame[1], -0.25);
     }
 
     #[test]
-    fn full_depth_at_envelope_peak_mutes_wet_signal() {
+    fn full_depth_at_curve_bottom_mutes_wet_signal() {
         let mut processor = FoxshaperProcessor::default();
         let mut frame = [0.5, -0.25];
 
-        processor.process_frame(&mut frame, params(1.0, 0.5, 1.0));
+        processor.process_frame(&mut frame, params(ShapePreset::Sidechain, 1.0, 0.0, 1.0));
 
         assert_close(frame[0], 0.0);
         assert_close(frame[1], 0.0);
@@ -139,23 +269,42 @@ mod tests {
         let mut processor = FoxshaperProcessor::default();
         let mut frame = [0.5, -0.25];
 
-        processor.process_frame(&mut frame, params(1.0, 0.5, 0.5));
+        processor.process_frame(&mut frame, params(ShapePreset::Sidechain, 1.0, 0.0, 0.5));
 
         assert_close(frame[0], 0.25);
         assert_close(frame[1], -0.125);
     }
 
     #[test]
-    fn output_gain_scales_after_mix() {
+    fn trim_and_output_gain_scale_after_mix() {
         let mut processor = FoxshaperProcessor::default();
         let mut frame = [0.5, -0.25];
-        let mut params = params(0.0, 0.0, 1.0);
-        params.output_gain = 2.0;
+        let mut params = params(ShapePreset::Sidechain, 0.0, 0.0, 1.0);
+        params.trim_gain = 2.0;
+        params.output_gain = 0.5;
 
         processor.process_frame(&mut frame, params);
 
+        assert_close(frame[0], 0.5);
+        assert_close(frame[1], -0.25);
+    }
+
+    #[test]
+    fn smoothing_moves_toward_gain_target_after_first_frame() {
+        let mut processor = FoxshaperProcessor::default();
+        processor.set_sample_rate(1_000.0);
+        let mut frame = [1.0, 1.0];
+        let mut params = params(ShapePreset::RampDown, 1.0, 0.0, 1.0);
+        params.smooth = 1.0;
+
+        processor.process_frame(&mut frame, params);
         assert_close(frame[0], 1.0);
-        assert_close(frame[1], -0.5);
+
+        params.phase_offset = 0.5;
+        processor.process_frame(&mut frame, params);
+
+        assert!(frame[0] < 1.0);
+        assert!(frame[0] > 0.5);
     }
 
     #[test]
@@ -164,20 +313,33 @@ mod tests {
         processor.set_sample_rate(4.0);
         let mut frame = [0.0, 0.0];
 
-        processor.process_frame(&mut frame, params(0.0, 0.0, 1.0));
+        processor.process_frame(&mut frame, params(ShapePreset::Sidechain, 0.0, 0.0, 1.0));
 
         assert_close(processor.current_phase(), 0.25);
     }
 
     #[test]
-    fn reset_restarts_shape_phase() {
+    fn reset_restarts_shape_phase_and_gain_smoothing() {
         let mut processor = FoxshaperProcessor::default();
         processor.set_sample_rate(4.0);
         let mut frame = [0.0, 0.0];
 
-        processor.process_frame(&mut frame, params(0.0, 0.0, 1.0));
+        processor.process_frame(&mut frame, params(ShapePreset::Sidechain, 0.0, 0.0, 1.0));
         processor.reset();
 
         assert_close(processor.current_phase(), 0.0);
+        assert!(!processor.gain_initialized);
+    }
+
+    #[test]
+    fn extra_channels_do_not_get_processed() {
+        let mut processor = FoxshaperProcessor::default();
+        let mut frame = [1.0, 1.0, 1.0];
+
+        processor.process_frame(&mut frame, params(ShapePreset::Sidechain, 1.0, 0.0, 1.0));
+
+        assert_close(frame[0], 0.0);
+        assert_close(frame[1], 0.0);
+        assert_close(frame[2], 1.0);
     }
 }

@@ -72,9 +72,12 @@ impl Plugin for Foxshaper {
             let frame_params = FoxshaperFrameParams::from_plain_values(
                 self.params.rate_hz.smoothed.next(),
                 self.params.depth.smoothed.next(),
+                self.params.shape_preset.value(),
                 self.params.shape.smoothed.next(),
                 self.params.phase_offset.smoothed.next(),
+                self.params.smooth.smoothed.next(),
                 self.params.mix.smoothed.next(),
+                self.params.trim.smoothed.next(),
                 self.params.output_gain.smoothed.next(),
             );
 

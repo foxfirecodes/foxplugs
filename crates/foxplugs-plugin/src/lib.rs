@@ -36,8 +36,17 @@ pub mod params {
     }
 
     pub fn output_gain_param_with_range(default_db: f32, min_db: f32, max_db: f32) -> FloatParam {
+        gain_db_param("Output", default_db, min_db, max_db)
+    }
+
+    pub fn gain_db_param(
+        name: &'static str,
+        default_db: f32,
+        min_db: f32,
+        max_db: f32,
+    ) -> FloatParam {
         FloatParam::new(
-            "Output",
+            name,
             util::db_to_gain(default_db),
             FloatRange::Skewed {
                 min: util::db_to_gain(min_db),
