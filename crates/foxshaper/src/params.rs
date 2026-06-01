@@ -77,6 +77,23 @@ impl SyncRhythm {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
+pub enum TriggerMode {
+    #[id = "sync"]
+    Sync,
+    #[id = "midi"]
+    MIDI,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
+pub enum LoopMode {
+    #[id = "loop"]
+    Loop,
+    #[id = "one-shot"]
+    #[name = "1-Shot"]
+    OneShot,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Enum)]
 pub enum ShapePreset {
     #[id = "sidechain"]
     Sidechain,
@@ -113,6 +130,15 @@ pub struct FoxshaperParams {
 
     #[id = "sync_rhythm"]
     pub sync_rhythm: EnumParam<SyncRhythm>,
+
+    #[id = "trigger_mode"]
+    pub trigger_mode: EnumParam<TriggerMode>,
+
+    #[id = "loop_mode"]
+    pub loop_mode: EnumParam<LoopMode>,
+
+    #[id = "end_marker"]
+    pub end_marker: FloatParam,
 
     #[id = "depth"]
     pub depth: FloatParam,
@@ -151,6 +177,9 @@ impl Default for FoxshaperParams {
             rate_hz: params::hz_param("Rate", 1.0, RATE_MIN_HZ, RATE_MAX_HZ),
             sync_length: EnumParam::new("Length", SyncLength::OneBar),
             sync_rhythm: EnumParam::new("Feel", SyncRhythm::Straight),
+            trigger_mode: EnumParam::new("Trigger", TriggerMode::Sync),
+            loop_mode: EnumParam::new("Loop", LoopMode::Loop),
+            end_marker: params::percentage_param("End", 1.0),
             depth: params::percentage_param("Depth", 1.0),
             shape_preset: EnumParam::new("Wave", ShapePreset::Sidechain),
             shape: params::percentage_param("Shape", 0.5),

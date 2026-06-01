@@ -54,6 +54,7 @@ pub struct FoxshaperProcessor {
     phase: f32,
     smoothed_gain: f32,
     gain_initialized: bool,
+    one_shot_active: bool,
 }
 
 impl Default for FoxshaperProcessor {
@@ -63,6 +64,7 @@ impl Default for FoxshaperProcessor {
             phase: 0.0,
             smoothed_gain: 1.0,
             gain_initialized: false,
+            one_shot_active: false,
         }
     }
 }
@@ -78,6 +80,12 @@ impl FoxshaperProcessor {
         self.phase = 0.0;
         self.smoothed_gain = 1.0;
         self.gain_initialized = false;
+        self.one_shot_active = false;
+    }
+
+    pub fn trigger(&mut self) {
+        self.phase = 0.0;
+        self.one_shot_active = true;
     }
 
     #[cfg(test)]
@@ -122,6 +130,30 @@ impl FoxshaperProcessor {
     ) {
         self.process_frame_at_phase(samples, params, self.phase);
         self.phase = lfo::advance_phase(self.phase, params.rate_hz, self.sample_rate);
+    }
+
+    #[inline]
+    pub fn process_frame_one_shot<'a>(
+        &mut self,
+        samples: impl IntoIterator<Item = &'a mut f32>,
+        params: FoxshaperFrameParams,
+        end_marker: f32,
+    ) {
+        let end_marker = end_marker.clamp(0.0, 1.0);
+        let phase = if self.one_shot_active {
+            self.phase.min(end_marker)
+        } else {
+            end_marker
+        };
+        self.process_frame_at_phase(samples, params, phase);
+
+        if self.one_shot_active {
+            let phase_increment = params.rate_hz.max(0.0) / self.sample_rate.max(1.0);
+            self.phase = (self.phase + phase_increment).min(end_marker);
+            if self.phase >= end_marker {
+                self.one_shot_active = false;
+            }
+        }
     }
 
     #[inline]
@@ -391,6 +423,46 @@ mod tests {
 
         assert!(frame[0] < 1.0);
         assert!(frame[0] > 0.5);
+    }
+
+    #[test]
+    fn trigger_restarts_phase_for_midi_triggering() {
+        let mut processor = FoxshaperProcessor::default();
+        processor.set_sample_rate(4.0);
+        let mut frame = [0.0, 0.0];
+
+        processor.process_frame(&mut frame, params(ShapePreset::Sidechain, 0.0, 0.0, 1.0));
+        assert_close(processor.current_phase(), 0.25);
+
+        processor.trigger();
+
+        assert_close(processor.current_phase(), 0.0);
+        assert!(processor.one_shot_active);
+    }
+
+    #[test]
+    fn one_shot_holds_end_marker_until_triggered() {
+        let mut processor = FoxshaperProcessor::default();
+        processor.set_sample_rate(4.0);
+        let mut frame = [1.0, 1.0];
+
+        processor.process_frame_one_shot(
+            &mut frame,
+            params(ShapePreset::RampDown, 1.0, 0.0, 1.0),
+            0.5,
+        );
+        assert_close(frame[0], 0.5);
+        assert_close(processor.current_phase(), 0.0);
+
+        processor.trigger();
+        frame = [1.0, 1.0];
+        processor.process_frame_one_shot(
+            &mut frame,
+            params(ShapePreset::RampDown, 1.0, 0.0, 1.0),
+            0.5,
+        );
+        assert_close(frame[0], 1.0);
+        assert_close(processor.current_phase(), 0.25);
     }
 
     #[test]

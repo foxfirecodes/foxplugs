@@ -34,20 +34,23 @@ pub(crate) fn create(
                     knob_cell(cx, &params.lfo_mode, None);
                     knob_cell(cx, &params.sync_length, None);
                     knob_cell(cx, &params.sync_rhythm, None);
+                    knob_cell(cx, &params.trigger_mode, None);
+                    knob_cell(cx, &params.loop_mode, None);
+                })
+                .class("knob-row");
+
+                HStack::new(cx, |cx| {
                     knob_cell(cx, &params.rate_hz, Some(0.01));
                     knob_cell(cx, &params.shape_preset, None);
-                })
-                .class("knob-row");
-
-                HStack::new(cx, |cx| {
                     knob_cell(cx, &params.depth, Some(0.01));
                     knob_cell(cx, &params.shape, Some(0.01));
-                    knob_cell(cx, &params.phase_offset, Some(0.01));
-                    knob_cell(cx, &params.smooth, Some(0.01));
+                    knob_cell(cx, &params.end_marker, Some(0.01));
                 })
                 .class("knob-row");
 
                 HStack::new(cx, |cx| {
+                    knob_cell(cx, &params.phase_offset, Some(0.01));
+                    knob_cell(cx, &params.smooth, Some(0.01));
                     knob_cell(cx, &params.mix, Some(0.01));
                     // Gain parameters are stored as linear gain, so snapping remains in linear units.
                     knob_cell(cx, &params.trim, Some(0.05));
