@@ -5,6 +5,9 @@ A bitcrusher CLAP/VST3 audio effect plugin inspired by Ableton Live's Redux.
 ## Parameters
 
 - **Bit Depth** is intentionally continuous for now. The Foxplugs knob snaps drag/scroll movement for usability, but host automation and text entry can use fractional values.
+  - Bit-depth reduction quantizes amplitude to fewer levels. Low bit depths are intentionally aggressive, but the DSP avoids the usual low-bit zero-deadband silence by forcing nonzero samples onto a quantized level.
+  - That no-zero quantizer is followed by smoothed level compensation so very low bit depths keep their crushed character without large sustained loudness boosts.
+  - Higher bit depths, especially above about 6–8 bits, can sound subtle because the quantization steps become very small.
 - **Downsample** is intentionally continuous/fractional for now. Fractional factors use the DSP's fractional sample-and-hold phase behavior.
 - **Mix** is dry/wet blend.
 - **Output** is stored as linear gain and displayed in dB; the custom knob snap step is in linear gain units.
