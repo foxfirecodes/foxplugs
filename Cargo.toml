@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
   "crates/foxcrush",
+  "crates/foxshaper",
   "crates/foxplugs-dsp",
   "crates/foxplugs-plugin",
   "crates/foxplugs-ui",

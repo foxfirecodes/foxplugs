@@ -17,6 +17,13 @@ label.title {
     alignment: bottom-center;
 }
 
+label.subtitle {
+    color: #6ea8fe;
+    font-size: 13;
+    height: 24px;
+    alignment: center;
+}
+
 vstack.knob-grid {
     row-between: 14px;
     child-space: 16px;

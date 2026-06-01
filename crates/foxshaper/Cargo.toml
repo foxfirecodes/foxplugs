@@ -1,0 +1,22 @@
+[package]
+name = "foxshaper"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+description = "A multi-shaper audio effect plugin scaffold for the Foxplugs suite"
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[features]
+default = ["gui"]
+gui = ["dep:foxplugs-ui", "dep:vizia_plug"]
+dev-assert-process-allocs = ["nih_plug/assert_process_allocs"]
+
+[dependencies]
+foxplugs-dsp = { workspace = true }
+foxplugs-plugin = { workspace = true }
+foxplugs-ui = { workspace = true, optional = true }
+nih_plug = { workspace = true, features = ["standalone"] }
+vizia_plug = { workspace = true, optional = true }

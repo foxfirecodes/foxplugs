@@ -1276,11 +1276,25 @@ version = "0.1.0"
 [[package]]
 name = "foxplugs-plugin"
 version = "0.1.0"
+dependencies = [
+ "nih_plug",
+]
 
 [[package]]
 name = "foxplugs-ui"
 version = "0.1.0"
 dependencies = [
+ "nih_plug",
+ "vizia_plug",
+]
+
+[[package]]
+name = "foxshaper"
+version = "0.1.0"
+dependencies = [
+ "foxplugs-dsp",
+ "foxplugs-plugin",
+ "foxplugs-ui",
  "nih_plug",
  "vizia_plug",
 ]
