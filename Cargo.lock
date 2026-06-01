@@ -1270,6 +1270,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "foxplugs-dsp"
+version = "0.1.0"
+
+[[package]]
+name = "foxplugs-plugin"
+version = "0.1.0"
+
+[[package]]
 name = "foxplugs-ui"
 version = "0.1.0"
 dependencies = [

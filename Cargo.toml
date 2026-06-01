@@ -1,6 +1,12 @@
 [workspace]
 resolver = "2"
-members = ["crates/foxcrush", "crates/foxplugs-ui", "crates/xtask"]
+members = [
+  "crates/foxcrush",
+  "crates/foxplugs-dsp",
+  "crates/foxplugs-plugin",
+  "crates/foxplugs-ui",
+  "crates/xtask",
+]
 default-members = ["crates/foxcrush"]
 
 [workspace.package]
@@ -9,6 +15,8 @@ license = "GPL-3.0-or-later"
 repository = "https://github.com/foxfire/foxplugs"
 
 [workspace.dependencies]
+foxplugs-dsp = { path = "crates/foxplugs-dsp" }
+foxplugs-plugin = { path = "crates/foxplugs-plugin" }
 foxplugs-ui = { path = "crates/foxplugs-ui" }
 nih_plug = { git = "https://github.com/BillyDM/nih-plug.git" }
 nih_plug_xtask = { git = "https://github.com/BillyDM/nih-plug.git" }
