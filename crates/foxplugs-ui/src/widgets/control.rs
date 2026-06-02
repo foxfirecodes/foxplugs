@@ -2,6 +2,7 @@ use nih_plug::prelude::{Param, ParamPtr};
 use vizia_plug::vizia::prelude::*;
 use vizia_plug::vizia::vg;
 use vizia_plug::widgets::param_base::ParamWidgetBase;
+use vizia_plug::widgets::util::ModifiersExt;
 
 #[derive(Clone, Copy, Debug)]
 pub struct ParamSliderOptions {
@@ -14,7 +15,7 @@ impl Default for ParamSliderOptions {
     fn default() -> Self {
         Self {
             width: 160.0,
-            height: 34.0,
+            height: 42.0,
             snap_step: None,
         }
     }
@@ -101,6 +102,20 @@ impl ParamSlider {
         let normalized = self.snap_normalized(self.normalized_from_x(cx, x));
         self.param_base.set_normalized_value(cx, normalized);
     }
+
+    fn reset_to_default(&mut self, cx: &mut EventContext) {
+        if self.dragging {
+            self.dragging = false;
+            cx.release();
+            cx.set_active(false);
+            self.param_base.end_set_parameter(cx);
+        }
+
+        self.param_base.begin_set_parameter(cx);
+        self.param_base
+            .set_normalized_value(cx, self.param_base.default_normalized_value());
+        self.param_base.end_set_parameter(cx);
+    }
 }
 
 impl View for ParamSlider {
@@ -111,12 +126,23 @@ impl View for ParamSlider {
     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
         event.map(|window_event, meta| match window_event {
             WindowEvent::MouseDown(MouseButton::Left) => {
-                self.dragging = true;
-                cx.capture();
-                cx.focus();
-                cx.set_active(true);
-                self.param_base.begin_set_parameter(cx);
-                self.set_from_x(cx, cx.mouse().cursor_x);
+                if cx.modifiers().command() {
+                    self.reset_to_default(cx);
+                } else {
+                    self.dragging = true;
+                    cx.capture();
+                    cx.focus();
+                    cx.set_active(true);
+                    self.param_base.begin_set_parameter(cx);
+                    self.set_from_x(cx, cx.mouse().cursor_x);
+                }
+                meta.consume();
+            }
+            WindowEvent::MouseDoubleClick(MouseButton::Left)
+            | WindowEvent::MouseDown(MouseButton::Right)
+            | WindowEvent::MouseDoubleClick(MouseButton::Right)
+            | WindowEvent::MouseTripleClick(MouseButton::Right) => {
+                self.reset_to_default(cx);
                 meta.consume();
             }
             WindowEvent::MouseMove(x, _) if self.dragging => {
@@ -166,7 +192,9 @@ impl View for ParamSlider {
     }
 }
 
-pub struct ParamStepper;
+pub struct ParamStepper {
+    param_base: ParamWidgetBase,
+}
 
 impl ParamStepper {
     pub fn new<'c, 'p, P>(cx: &'c mut Context, param: &'p P) -> Handle<'c, Self>
@@ -182,46 +210,63 @@ impl ParamStepper {
             param_ptr.normalized_value_to_string(value_signal.get(), true)
         });
 
-        Self.build(cx, move |cx| {
-            VStack::new(cx, |cx| {
-                Label::new(cx, name.clone()).class("stepper-name");
-                HStack::new(cx, |cx| {
-                    let prev_base = param_base;
-                    Label::new(cx, "‹")
-                        .class("stepper-button")
-                        .on_press(move |cx| {
-                            let current = prev_base.unmodulated_normalized_value();
-                            let previous = prev_base.previous_normalized_step(current, false);
-                            prev_base.begin_set_parameter(cx);
-                            prev_base.set_normalized_value(cx, previous);
-                            prev_base.end_set_parameter(cx);
-                        });
+        Self { param_base }
+            .build(cx, move |cx| {
+                VStack::new(cx, |cx| {
+                    Label::new(cx, name.clone()).class("stepper-name");
+                    HStack::new(cx, |cx| {
+                        let prev_base = param_base;
+                        Label::new(cx, "‹")
+                            .class("stepper-button")
+                            .on_press(move |cx| {
+                                let current = prev_base.unmodulated_normalized_value();
+                                let previous = prev_base.previous_normalized_step(current, false);
+                                prev_base.begin_set_parameter(cx);
+                                prev_base.set_normalized_value(cx, previous);
+                                prev_base.end_set_parameter(cx);
+                            });
 
-                    Label::new(cx, display_value).class("stepper-value");
+                        Label::new(cx, display_value).class("stepper-value");
 
-                    let next_base = param_base;
-                    Label::new(cx, "›")
-                        .class("stepper-button")
-                        .on_press(move |cx| {
-                            let current = next_base.unmodulated_normalized_value();
-                            let next = next_base.next_normalized_step(current, false);
-                            next_base.begin_set_parameter(cx);
-                            next_base.set_normalized_value(cx, next);
-                            next_base.end_set_parameter(cx);
-                        });
+                        let next_base = param_base;
+                        Label::new(cx, "›")
+                            .class("stepper-button")
+                            .on_press(move |cx| {
+                                let current = next_base.unmodulated_normalized_value();
+                                let next = next_base.next_normalized_step(current, false);
+                                next_base.begin_set_parameter(cx);
+                                next_base.set_normalized_value(cx, next);
+                                next_base.end_set_parameter(cx);
+                            });
+                    })
+                    .class("stepper-row");
                 })
-                .class("stepper-row");
+                .class("stepper-shell");
             })
-            .class("stepper-shell");
-        })
-        .class("param-stepper")
-        .bind(value_signal, |mut h| h.needs_redraw())
+            .class("param-stepper")
+            .bind(value_signal, |mut h| h.needs_redraw())
     }
 }
 
 impl View for ParamStepper {
     fn element(&self) -> Option<&'static str> {
         Some("param-stepper")
+    }
+
+    fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+        event.map(|window_event, meta| match window_event {
+            WindowEvent::MouseDoubleClick(MouseButton::Left)
+            | WindowEvent::MouseDown(MouseButton::Right)
+            | WindowEvent::MouseDoubleClick(MouseButton::Right)
+            | WindowEvent::MouseTripleClick(MouseButton::Right) => {
+                self.param_base.begin_set_parameter(cx);
+                self.param_base
+                    .set_normalized_value(cx, self.param_base.default_normalized_value());
+                self.param_base.end_set_parameter(cx);
+                meta.consume();
+            }
+            _ => {}
+        });
     }
 }
 

@@ -12,7 +12,7 @@ use crate::processor::evaluate_shape;
 use crate::FoxshaperParams;
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (900, 700))
+    ViziaState::new(|| (920, 720))
 }
 
 pub(crate) fn create(
@@ -30,7 +30,7 @@ pub(crate) fn create(
                 })
                 .class("brand-block");
 
-                Label::new(cx, "Phase-synced volume movement").class("top-hint");
+                Label::new(cx, "Phase-synced volume shaper").class("top-hint");
             })
             .class("top-bar");
 
@@ -49,7 +49,7 @@ pub(crate) fn create(
                     })
                     .class("compact-knob-row");
 
-                    Label::new(cx, "Custom curves: select Custom, click/drag the graph, right-click to remove points.")
+                    Label::new(cx, "Custom: drag graph; right-click removes points.")
                         .class("panel-help");
                 })
                 .class("control-panel");
@@ -85,7 +85,7 @@ pub(crate) fn create(
                         slider_cell(cx, &params.end_marker, Some(0.01));
                     })
                     .class("compact-knob-row");
-                    Label::new(cx, "MIDI: notes retrigger; MIDI Switch maps C to trigger and C#–A to wave slots.")
+                    Label::new(cx, "MIDI notes retrigger; C#–A select wave slots.")
                         .class("panel-help");
                 })
                 .class("control-panel");
@@ -133,7 +133,7 @@ fn slider_cell<P: nih_plug::params::Param + 'static>(
         param,
         ParamSliderOptions::default()
             .with_snap_step(snap_step)
-            .with_width(132.0),
+            .with_width(124.0),
     );
 }
 

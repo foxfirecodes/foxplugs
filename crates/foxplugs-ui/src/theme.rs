@@ -69,10 +69,13 @@ vstack.control-panel {
     border-color: #232034;
     border-width: 1px;
     corner-radius: 8px;
-    child-space: 12px;
+    child-top: 14px;
+    child-bottom: 14px;
+    child-left: 16px;
+    child-right: 16px;
     row-between: 8px;
     width: 1s;
-    height: 140px;
+    height: 150px;
 }
 
 label.section-title {
@@ -85,14 +88,14 @@ label.section-title {
 label.panel-help {
     color: #6f6a82;
     font-size: 10;
-    height: 26px;
+    height: 18px;
     alignment: top-left;
 }
 
 hstack.compact-knob-row {
-    col-between: 10px;
+    col-between: 16px;
     width: 1s;
-    alignment: center;
+    alignment: left;
 }
 
 param-slider {
@@ -101,34 +104,39 @@ param-slider {
 
 vstack.param-slider-shell {
     background-color: transparent;
-    row-between: 4px;
+    row-between: 6px;
+    width: 1s;
+    height: 1s;
 }
 
 hstack.param-slider-header {
     background-color: transparent;
     col-between: 8px;
     width: 1s;
+    height: 18px;
 }
 
 label.param-slider-name {
     color: #6ea8fe;
     font-size: 11;
     width: 1s;
+    height: 18px;
     alignment: left;
 }
 
 label.param-slider-value {
     color: #d8d6e2;
     font-size: 11;
-    width: 70px;
+    width: 66px;
+    height: 18px;
     alignment: right;
 }
 
 
 param-stepper {
     background-color: transparent;
-    width: 108px;
-    height: 44px;
+    width: 116px;
+    height: 46px;
 }
 
 vstack.stepper-shell {
@@ -139,8 +147,8 @@ vstack.stepper-shell {
 
 label.stepper-name {
     color: #6ea8fe;
-    font-size: 10;
-    height: 14px;
+    font-size: 11;
+    height: 16px;
     alignment: left;
 }
 
@@ -224,11 +232,14 @@ hstack.mix-strip {
     border-color: #232034;
     border-width: 1px;
     corner-radius: 8px;
-    child-space: 12px;
+    child-top: 14px;
+    child-bottom: 14px;
+    child-left: 16px;
+    child-right: 16px;
     col-between: 16px;
     width: 1s;
     height: 88px;
-    alignment: center;
+    alignment: left;
 }
 
 vstack.knob-grid {
