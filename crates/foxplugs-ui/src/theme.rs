@@ -95,6 +95,76 @@ hstack.compact-knob-row {
     alignment: center;
 }
 
+param-slider {
+    background-color: transparent;
+}
+
+vstack.param-slider-shell {
+    background-color: transparent;
+    row-between: 4px;
+}
+
+hstack.param-slider-header {
+    background-color: transparent;
+    col-between: 8px;
+    width: 1s;
+}
+
+label.param-slider-name {
+    color: #6ea8fe;
+    font-size: 11;
+    width: 1s;
+    alignment: center-left;
+}
+
+label.param-slider-value {
+    color: #d8d6e2;
+    font-size: 11;
+    width: 70px;
+    alignment: center-right;
+}
+
+param-toggle-group {
+    background-color: transparent;
+}
+
+vstack.toggle-group-shell {
+    background-color: transparent;
+    row-between: 5px;
+    width: 1s;
+}
+
+label.toggle-group-name {
+    color: #6ea8fe;
+    font-size: 11;
+    height: 16px;
+    alignment: center-left;
+}
+
+hstack.toggle-row {
+    col-between: 4px;
+    width: 1s;
+    background-color: transparent;
+}
+
+label.toggle-option {
+    background-color: #1a1825;
+    border-color: #2a2638;
+    border-width: 1px;
+    corner-radius: 4px;
+    color: #d8d6e2;
+    font-size: 10;
+    padding: 3px 6px;
+    height: 24px;
+    width: 1s;
+    alignment: center;
+}
+
+label.toggle-option:hover {
+    border-color: #b388ff;
+    color: #b388ff;
+}
+
 hstack.mix-strip {
     background-color: #12101c;
     border-color: #232034;

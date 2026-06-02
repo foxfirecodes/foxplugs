@@ -1,4 +1,4 @@
-use foxplugs_ui::{ParamKnob, ParamKnobOptions, FOXPLUGS_DARK_STYLESHEET};
+use foxplugs_ui::{ParamSlider, ParamSliderOptions, ParamToggleGroup, FOXPLUGS_DARK_STYLESHEET};
 use nih_plug::prelude::Editor;
 use std::sync::Arc;
 use vizia_plug::vizia::prelude::*;
@@ -40,9 +40,9 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Shape").class("section-title");
                     HStack::new(cx, |cx| {
-                        knob_cell(cx, &params.shape_preset, None);
-                        knob_cell(cx, &params.shape, Some(0.01));
-                        knob_cell(cx, &params.depth, Some(0.01));
+                        toggle_cell(cx, &params.shape_preset);
+                        slider_cell(cx, &params.shape, Some(0.01));
+                        slider_cell(cx, &params.depth, Some(0.01));
                     })
                     .class("compact-knob-row");
 
@@ -54,11 +54,11 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Timing").class("section-title");
                     HStack::new(cx, |cx| {
-                        knob_cell(cx, &params.lfo_mode, None);
-                        knob_cell(cx, &params.sync_length, None);
-                        knob_cell(cx, &params.sync_rhythm, None);
-                        knob_cell(cx, &params.rate_hz, Some(0.01));
-                        knob_cell(cx, &params.phase_offset, Some(0.01));
+                        toggle_cell(cx, &params.lfo_mode);
+                        toggle_cell(cx, &params.sync_length);
+                        toggle_cell(cx, &params.sync_rhythm);
+                        slider_cell(cx, &params.rate_hz, Some(0.01));
+                        slider_cell(cx, &params.phase_offset, Some(0.01));
                     })
                     .class("compact-knob-row");
                 })
@@ -70,10 +70,10 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Trigger").class("section-title");
                     HStack::new(cx, |cx| {
-                        knob_cell(cx, &params.trigger_mode, None);
-                        knob_cell(cx, &params.loop_mode, None);
-                        knob_cell(cx, &params.end_marker, Some(0.01));
-                        knob_cell(cx, &params.midi_switch, None);
+                        toggle_cell(cx, &params.trigger_mode);
+                        toggle_cell(cx, &params.loop_mode);
+                        slider_cell(cx, &params.end_marker, Some(0.01));
+                        toggle_cell(cx, &params.midi_switch);
                     })
                     .class("compact-knob-row");
                     Label::new(cx, "MIDI: notes retrigger; MIDI Switch maps C to trigger and C#–A to wave slots.")
@@ -84,11 +84,11 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Audio Detector").class("section-title");
                     HStack::new(cx, |cx| {
-                        knob_cell(cx, &params.audio_sidechain, None);
-                        knob_cell(cx, &params.audio_threshold, Some(0.01));
-                        knob_cell(cx, &params.audio_detail, Some(0.01));
-                        knob_cell(cx, &params.audio_low_cut_hz, Some(1.0));
-                        knob_cell(cx, &params.audio_high_cut_hz, Some(10.0));
+                        toggle_cell(cx, &params.audio_sidechain);
+                        slider_cell(cx, &params.audio_threshold, Some(0.01));
+                        slider_cell(cx, &params.audio_detail, Some(0.01));
+                        slider_cell(cx, &params.audio_low_cut_hz, Some(1.0));
+                        slider_cell(cx, &params.audio_high_cut_hz, Some(10.0));
                     })
                     .class("compact-knob-row");
                 })
@@ -98,11 +98,11 @@ pub(crate) fn create(
 
             HStack::new(cx, |cx| {
                 Label::new(cx, "Output").class("section-title");
-                knob_cell(cx, &params.smooth, Some(0.01));
-                knob_cell(cx, &params.mix, Some(0.01));
+                slider_cell(cx, &params.smooth, Some(0.01));
+                slider_cell(cx, &params.mix, Some(0.01));
                 // Gain parameters are stored as linear gain, so snapping remains in linear units.
-                knob_cell(cx, &params.trim, Some(0.05));
-                knob_cell(cx, &params.output_gain, Some(0.05));
+                slider_cell(cx, &params.trim, Some(0.05));
+                slider_cell(cx, &params.output_gain, Some(0.05));
             })
             .class("mix-strip");
         })
@@ -111,18 +111,22 @@ pub(crate) fn create(
     })
 }
 
-fn knob_cell<P: nih_plug::params::Param + 'static>(
+fn slider_cell<P: nih_plug::params::Param + 'static>(
     cx: &mut Context,
     param: &P,
     snap_step: Option<f32>,
 ) {
-    ParamKnob::new(
+    ParamSlider::new(
         cx,
         param,
-        ParamKnobOptions::default()
+        ParamSliderOptions::default()
             .with_snap_step(snap_step)
-            .with_diameter(52.0),
+            .with_width(132.0),
     );
+}
+
+fn toggle_cell<P: nih_plug::params::Param + 'static>(cx: &mut Context, param: &P) {
+    ParamToggleGroup::new(cx, param);
 }
 
 struct WavePreview {
