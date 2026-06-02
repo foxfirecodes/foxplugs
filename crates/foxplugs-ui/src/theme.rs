@@ -18,7 +18,7 @@ vstack.foxshaper-root {
 
 hstack.top-bar {
     width: 1s;
-    height: 66px;
+    height: 56px;
     child-left: 14px;
     child-right: 14px;
     col-between: 18px;
@@ -33,21 +33,21 @@ vstack.brand-block {
 label.title {
     font-size: 26;
     color: #b388ff;
-    height: 34px;
+    height: 30px;
     alignment: bottom-left;
 }
 
 label.subtitle {
     color: #6ea8fe;
     font-size: 13;
-    height: 22px;
+    height: 18px;
     alignment: top-left;
 }
 
 label.top-hint {
     color: #6f6a82;
     font-size: 12;
-    alignment: center-right;
+    alignment: right;
     width: 1s;
 }
 
@@ -72,14 +72,14 @@ vstack.control-panel {
     child-space: 12px;
     row-between: 8px;
     width: 1s;
-    height: 132px;
+    height: 140px;
 }
 
 label.section-title {
     color: #b388ff;
     font-size: 13;
     height: 18px;
-    alignment: center-left;
+    alignment: left;
 }
 
 label.panel-help {
@@ -114,14 +114,68 @@ label.param-slider-name {
     color: #6ea8fe;
     font-size: 11;
     width: 1s;
-    alignment: center-left;
+    alignment: left;
 }
 
 label.param-slider-value {
     color: #d8d6e2;
     font-size: 11;
     width: 70px;
-    alignment: center-right;
+    alignment: right;
+}
+
+
+param-stepper {
+    background-color: transparent;
+    width: 108px;
+    height: 44px;
+}
+
+vstack.stepper-shell {
+    background-color: transparent;
+    row-between: 3px;
+    width: 1s;
+}
+
+label.stepper-name {
+    color: #6ea8fe;
+    font-size: 10;
+    height: 14px;
+    alignment: left;
+}
+
+hstack.stepper-row {
+    background-color: transparent;
+    col-between: 3px;
+    width: 1s;
+    height: 24px;
+}
+
+label.stepper-button {
+    background-color: #1a1825;
+    border-color: #2a2638;
+    border-width: 1px;
+    corner-radius: 4px;
+    color: #b388ff;
+    width: 18px;
+    height: 24px;
+    alignment: center;
+}
+
+label.stepper-button:hover {
+    border-color: #b388ff;
+}
+
+label.stepper-value {
+    background-color: #15131f;
+    border-color: #2a2638;
+    border-width: 1px;
+    corner-radius: 4px;
+    color: #d8d6e2;
+    font-size: 10;
+    width: 1s;
+    height: 24px;
+    alignment: center;
 }
 
 param-toggle-group {
@@ -138,7 +192,7 @@ label.toggle-group-name {
     color: #6ea8fe;
     font-size: 11;
     height: 16px;
-    alignment: center-left;
+    alignment: left;
 }
 
 hstack.toggle-row {
@@ -173,7 +227,7 @@ hstack.mix-strip {
     child-space: 12px;
     col-between: 16px;
     width: 1s;
-    height: 104px;
+    height: 88px;
     alignment: center;
 }
 

@@ -1,4 +1,4 @@
-use foxplugs_ui::{ParamSlider, ParamSliderOptions, ParamToggleGroup, FOXPLUGS_DARK_STYLESHEET};
+use foxplugs_ui::{ParamSlider, ParamSliderOptions, ParamStepper, FOXPLUGS_DARK_STYLESHEET};
 use nih_plug::prelude::Editor;
 use std::sync::Arc;
 use vizia_plug::vizia::prelude::*;
@@ -12,7 +12,7 @@ use crate::processor::evaluate_shape;
 use crate::FoxshaperParams;
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (860, 620))
+    ViziaState::new(|| (900, 700))
 }
 
 pub(crate) fn create(
@@ -40,8 +40,11 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Shape").class("section-title");
                     HStack::new(cx, |cx| {
-                        toggle_cell(cx, &params.shape_preset);
+                        stepper_cell(cx, &params.shape_preset);
                         slider_cell(cx, &params.shape, Some(0.01));
+                    })
+                    .class("compact-knob-row");
+                    HStack::new(cx, |cx| {
                         slider_cell(cx, &params.depth, Some(0.01));
                     })
                     .class("compact-knob-row");
@@ -54,9 +57,12 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Timing").class("section-title");
                     HStack::new(cx, |cx| {
-                        toggle_cell(cx, &params.lfo_mode);
-                        toggle_cell(cx, &params.sync_length);
-                        toggle_cell(cx, &params.sync_rhythm);
+                        stepper_cell(cx, &params.lfo_mode);
+                        stepper_cell(cx, &params.sync_length);
+                        stepper_cell(cx, &params.sync_rhythm);
+                    })
+                    .class("compact-knob-row");
+                    HStack::new(cx, |cx| {
                         slider_cell(cx, &params.rate_hz, Some(0.01));
                         slider_cell(cx, &params.phase_offset, Some(0.01));
                     })
@@ -70,10 +76,13 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Trigger").class("section-title");
                     HStack::new(cx, |cx| {
-                        toggle_cell(cx, &params.trigger_mode);
-                        toggle_cell(cx, &params.loop_mode);
+                        stepper_cell(cx, &params.trigger_mode);
+                        stepper_cell(cx, &params.loop_mode);
+                        stepper_cell(cx, &params.midi_switch);
+                    })
+                    .class("compact-knob-row");
+                    HStack::new(cx, |cx| {
                         slider_cell(cx, &params.end_marker, Some(0.01));
-                        toggle_cell(cx, &params.midi_switch);
                     })
                     .class("compact-knob-row");
                     Label::new(cx, "MIDI: notes retrigger; MIDI Switch maps C to trigger and C#–A to wave slots.")
@@ -84,9 +93,12 @@ pub(crate) fn create(
                 VStack::new(cx, |cx| {
                     Label::new(cx, "Audio Detector").class("section-title");
                     HStack::new(cx, |cx| {
-                        toggle_cell(cx, &params.audio_sidechain);
+                        stepper_cell(cx, &params.audio_sidechain);
                         slider_cell(cx, &params.audio_threshold, Some(0.01));
                         slider_cell(cx, &params.audio_detail, Some(0.01));
+                    })
+                    .class("compact-knob-row");
+                    HStack::new(cx, |cx| {
                         slider_cell(cx, &params.audio_low_cut_hz, Some(1.0));
                         slider_cell(cx, &params.audio_high_cut_hz, Some(10.0));
                     })
@@ -125,8 +137,8 @@ fn slider_cell<P: nih_plug::params::Param + 'static>(
     );
 }
 
-fn toggle_cell<P: nih_plug::params::Param + 'static>(cx: &mut Context, param: &P) {
-    ParamToggleGroup::new(cx, param);
+fn stepper_cell<P: nih_plug::params::Param + 'static>(cx: &mut Context, param: &P) {
+    ParamStepper::new(cx, param);
 }
 
 struct WavePreview {
@@ -158,7 +170,7 @@ impl WavePreview {
         .build(cx, |_| {})
         .class("wave-preview")
         .width(Stretch(1.0))
-        .height(Pixels(190.0))
+        .height(Pixels(170.0))
         .bind(shape_preset_signal, |mut h| h.needs_redraw())
         .bind(shape_signal, |mut h| h.needs_redraw())
         .bind(phase_signal, |mut h| h.needs_redraw())

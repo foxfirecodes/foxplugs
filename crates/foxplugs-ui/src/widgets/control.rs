@@ -166,6 +166,65 @@ impl View for ParamSlider {
     }
 }
 
+pub struct ParamStepper;
+
+impl ParamStepper {
+    pub fn new<'c, 'p, P>(cx: &'c mut Context, param: &'p P) -> Handle<'c, Self>
+    where
+        'p: 'c,
+        P: Param + 'static,
+    {
+        let param_base = ParamWidgetBase::new(cx, param);
+        let value_signal = param_base.unmodulated_signal(cx);
+        let param_ptr = param_base.param_ptr();
+        let name = unsafe { param_ptr.name() }.to_string();
+        let display_value = Memo::new(move |_| unsafe {
+            param_ptr.normalized_value_to_string(value_signal.get(), true)
+        });
+
+        Self.build(cx, move |cx| {
+            VStack::new(cx, |cx| {
+                Label::new(cx, name.clone()).class("stepper-name");
+                HStack::new(cx, |cx| {
+                    let prev_base = param_base;
+                    Label::new(cx, "‹")
+                        .class("stepper-button")
+                        .on_press(move |cx| {
+                            let current = prev_base.unmodulated_normalized_value();
+                            let previous = prev_base.previous_normalized_step(current, false);
+                            prev_base.begin_set_parameter(cx);
+                            prev_base.set_normalized_value(cx, previous);
+                            prev_base.end_set_parameter(cx);
+                        });
+
+                    Label::new(cx, display_value).class("stepper-value");
+
+                    let next_base = param_base;
+                    Label::new(cx, "›")
+                        .class("stepper-button")
+                        .on_press(move |cx| {
+                            let current = next_base.unmodulated_normalized_value();
+                            let next = next_base.next_normalized_step(current, false);
+                            next_base.begin_set_parameter(cx);
+                            next_base.set_normalized_value(cx, next);
+                            next_base.end_set_parameter(cx);
+                        });
+                })
+                .class("stepper-row");
+            })
+            .class("stepper-shell");
+        })
+        .class("param-stepper")
+        .bind(value_signal, |mut h| h.needs_redraw())
+    }
+}
+
+impl View for ParamStepper {
+    fn element(&self) -> Option<&'static str> {
+        Some("param-stepper")
+    }
+}
+
 pub struct ParamToggleGroup;
 
 impl ParamToggleGroup {
