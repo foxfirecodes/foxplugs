@@ -12,7 +12,7 @@ use crate::processor::evaluate_shape;
 use crate::FoxshaperParams;
 
 pub(crate) fn default_state() -> Arc<ViziaState> {
-    ViziaState::new(|| (760, 600))
+    ViziaState::new(|| (860, 620))
 }
 
 pub(crate) fn create(
@@ -23,53 +23,90 @@ pub(crate) fn create(
         cx.add_stylesheet(FOXPLUGS_DARK_STYLESHEET).ok();
 
         VStack::new(cx, |cx| {
-            Label::new(cx, "foxshaper").class("title");
+            HStack::new(cx, |cx| {
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "foxshaper").class("title");
+                    Label::new(cx, "Volume shaper").class("subtitle");
+                })
+                .class("brand-block");
 
-            Label::new(cx, "Volume shaper").class("subtitle");
+                Label::new(cx, "Phase-synced volume movement").class("top-hint");
+            })
+            .class("top-bar");
 
             WavePreview::new(cx, params.clone());
 
-            VStack::new(cx, |cx| {
-                HStack::new(cx, |cx| {
-                    knob_cell(cx, &params.lfo_mode, None);
-                    knob_cell(cx, &params.sync_length, None);
-                    knob_cell(cx, &params.sync_rhythm, None);
-                    knob_cell(cx, &params.trigger_mode, None);
-                    knob_cell(cx, &params.loop_mode, None);
-                    knob_cell(cx, &params.midi_switch, None);
-                })
-                .class("knob-row");
+            HStack::new(cx, |cx| {
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "Shape").class("section-title");
+                    HStack::new(cx, |cx| {
+                        knob_cell(cx, &params.shape_preset, None);
+                        knob_cell(cx, &params.shape, Some(0.01));
+                        knob_cell(cx, &params.depth, Some(0.01));
+                    })
+                    .class("compact-knob-row");
 
-                HStack::new(cx, |cx| {
-                    knob_cell(cx, &params.rate_hz, Some(0.01));
-                    knob_cell(cx, &params.shape_preset, None);
-                    knob_cell(cx, &params.depth, Some(0.01));
-                    knob_cell(cx, &params.shape, Some(0.01));
-                    knob_cell(cx, &params.end_marker, Some(0.01));
+                    Label::new(cx, "Custom curves: select Custom, click/drag the graph, right-click to remove points.")
+                        .class("panel-help");
                 })
-                .class("knob-row");
+                .class("control-panel");
 
-                HStack::new(cx, |cx| {
-                    knob_cell(cx, &params.audio_sidechain, None);
-                    knob_cell(cx, &params.audio_threshold, Some(0.01));
-                    knob_cell(cx, &params.audio_low_cut_hz, Some(1.0));
-                    knob_cell(cx, &params.audio_high_cut_hz, Some(10.0));
-                    knob_cell(cx, &params.audio_detail, Some(0.01));
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "Timing").class("section-title");
+                    HStack::new(cx, |cx| {
+                        knob_cell(cx, &params.lfo_mode, None);
+                        knob_cell(cx, &params.sync_length, None);
+                        knob_cell(cx, &params.sync_rhythm, None);
+                        knob_cell(cx, &params.rate_hz, Some(0.01));
+                        knob_cell(cx, &params.phase_offset, Some(0.01));
+                    })
+                    .class("compact-knob-row");
                 })
-                .class("knob-row");
-
-                HStack::new(cx, |cx| {
-                    knob_cell(cx, &params.phase_offset, Some(0.01));
-                    knob_cell(cx, &params.smooth, Some(0.01));
-                    knob_cell(cx, &params.mix, Some(0.01));
-                    // Gain parameters are stored as linear gain, so snapping remains in linear units.
-                    knob_cell(cx, &params.trim, Some(0.05));
-                    knob_cell(cx, &params.output_gain, Some(0.05));
-                })
-                .class("knob-row");
+                .class("control-panel");
             })
-            .class("knob-grid");
+            .class("panel-row");
+
+            HStack::new(cx, |cx| {
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "Trigger").class("section-title");
+                    HStack::new(cx, |cx| {
+                        knob_cell(cx, &params.trigger_mode, None);
+                        knob_cell(cx, &params.loop_mode, None);
+                        knob_cell(cx, &params.end_marker, Some(0.01));
+                        knob_cell(cx, &params.midi_switch, None);
+                    })
+                    .class("compact-knob-row");
+                    Label::new(cx, "MIDI: notes retrigger; MIDI Switch maps C to trigger and C#–A to wave slots.")
+                        .class("panel-help");
+                })
+                .class("control-panel");
+
+                VStack::new(cx, |cx| {
+                    Label::new(cx, "Audio Detector").class("section-title");
+                    HStack::new(cx, |cx| {
+                        knob_cell(cx, &params.audio_sidechain, None);
+                        knob_cell(cx, &params.audio_threshold, Some(0.01));
+                        knob_cell(cx, &params.audio_detail, Some(0.01));
+                        knob_cell(cx, &params.audio_low_cut_hz, Some(1.0));
+                        knob_cell(cx, &params.audio_high_cut_hz, Some(10.0));
+                    })
+                    .class("compact-knob-row");
+                })
+                .class("control-panel");
+            })
+            .class("panel-row");
+
+            HStack::new(cx, |cx| {
+                Label::new(cx, "Output").class("section-title");
+                knob_cell(cx, &params.smooth, Some(0.01));
+                knob_cell(cx, &params.mix, Some(0.01));
+                // Gain parameters are stored as linear gain, so snapping remains in linear units.
+                knob_cell(cx, &params.trim, Some(0.05));
+                knob_cell(cx, &params.output_gain, Some(0.05));
+            })
+            .class("mix-strip");
         })
+        .class("foxshaper-root")
         .alignment(Alignment::TopCenter);
     })
 }
@@ -84,7 +121,7 @@ fn knob_cell<P: nih_plug::params::Param + 'static>(
         param,
         ParamKnobOptions::default()
             .with_snap_step(snap_step)
-            .with_diameter(58.0),
+            .with_diameter(52.0),
     );
 }
 
@@ -107,8 +144,8 @@ impl WavePreview {
         }
         .build(cx, |_| {})
         .class("wave-preview")
-        .width(Pixels(640.0))
-        .height(Pixels(120.0))
+        .width(Stretch(1.0))
+        .height(Pixels(190.0))
         .bind(shape_preset_signal, |mut h| h.needs_redraw())
         .bind(shape_signal, |mut h| h.needs_redraw())
         .bind(phase_signal, |mut h| h.needs_redraw())
@@ -188,10 +225,10 @@ impl View for WavePreview {
             return;
         }
 
-        let left = bounds.x + 12.0;
-        let right = bounds.x + bounds.w - 12.0;
-        let top = bounds.y + 12.0;
-        let bottom = bounds.y + bounds.h - 12.0;
+        let left = bounds.x + 18.0;
+        let right = bounds.x + bounds.w - 18.0;
+        let top = bounds.y + 16.0;
+        let bottom = bounds.y + bounds.h - 16.0;
         let width = (right - left).max(1.0);
         let height = (bottom - top).max(1.0);
         let center_y = top + height * 0.5;
@@ -212,7 +249,7 @@ impl View for WavePreview {
         let custom_curve = self.params.custom_curve.snapshot();
 
         let mut curve = vg::PathBuilder::new();
-        let segments = 96;
+        let segments = 128;
         for i in 0..=segments {
             let t = i as f32 / segments as f32;
             let raw = if preset == ShapePreset::Custom {
@@ -257,10 +294,10 @@ impl View for WavePreview {
 }
 
 fn mouse_to_curve_position(bounds: BoundingBox, x: f32, y: f32) -> (f32, f32) {
-    let left = bounds.x + 12.0;
-    let right = bounds.x + bounds.w - 12.0;
-    let top = bounds.y + 12.0;
-    let bottom = bounds.y + bounds.h - 12.0;
+    let left = bounds.x + 18.0;
+    let right = bounds.x + bounds.w - 18.0;
+    let top = bounds.y + 16.0;
+    let bottom = bounds.y + bounds.h - 16.0;
     let width = (right - left).max(1.0);
     let height = (bottom - top).max(1.0);
 

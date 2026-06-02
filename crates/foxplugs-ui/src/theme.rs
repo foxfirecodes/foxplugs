@@ -10,26 +10,101 @@ label {
     color: #d8d6e2;
 }
 
+vstack.foxshaper-root {
+    row-between: 12px;
+    child-space: 14px;
+    width: 1s;
+}
+
+hstack.top-bar {
+    width: 1s;
+    height: 66px;
+    child-left: 14px;
+    child-right: 14px;
+    col-between: 18px;
+    alignment: center;
+}
+
+vstack.brand-block {
+    width: 220px;
+    row-between: 0px;
+}
+
 label.title {
     font-size: 26;
     color: #b388ff;
-    height: 48px;
-    alignment: bottom-center;
+    height: 34px;
+    alignment: bottom-left;
 }
 
 label.subtitle {
     color: #6ea8fe;
     font-size: 13;
-    height: 24px;
-    alignment: center;
+    height: 22px;
+    alignment: top-left;
+}
+
+label.top-hint {
+    color: #6f6a82;
+    font-size: 12;
+    alignment: center-right;
+    width: 1s;
 }
 
 wave-preview {
     background-color: #12101c;
     border-color: #2a2638;
     border-width: 1px;
-    corner-radius: 6px;
+    corner-radius: 8px;
     child-space: 8px;
+}
+
+hstack.panel-row {
+    col-between: 12px;
+    width: 1s;
+}
+
+vstack.control-panel {
+    background-color: #12101c;
+    border-color: #232034;
+    border-width: 1px;
+    corner-radius: 8px;
+    child-space: 12px;
+    row-between: 8px;
+    width: 1s;
+    height: 132px;
+}
+
+label.section-title {
+    color: #b388ff;
+    font-size: 13;
+    height: 18px;
+    alignment: center-left;
+}
+
+label.panel-help {
+    color: #6f6a82;
+    font-size: 10;
+    height: 26px;
+    alignment: top-left;
+}
+
+hstack.compact-knob-row {
+    col-between: 10px;
+    width: 1s;
+    alignment: center;
+}
+
+hstack.mix-strip {
+    background-color: #12101c;
+    border-color: #232034;
+    border-width: 1px;
+    corner-radius: 8px;
+    child-space: 12px;
+    col-between: 16px;
+    width: 1s;
+    height: 104px;
+    alignment: center;
 }
 
 vstack.knob-grid {
@@ -46,19 +121,19 @@ hstack.knob-row {
 
 vstack.knob-cell {
     width: 1s;
-    row-between: 6px;
+    row-between: 5px;
     alignment: top-center;
 }
 
 label.knob-name {
     color: #6ea8fe;
-    font-size: 11;
+    font-size: 10;
     alignment: center;
 }
 
 label.knob-value {
     color: #d8d6e2;
-    font-size: 12;
+    font-size: 11;
     alignment: center;
 }
 
