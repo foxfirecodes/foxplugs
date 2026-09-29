@@ -1,0 +1,284 @@
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.gtk.vfs.Daemon' requested by ':1.0' (uid=1000 pid=4 comm="/usr/bin/reaper -newinst -nosplash")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.gtk.vfs.Daemon'
+fuse: device /dev/fuse not found. Kernel module not loaded?
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x2_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x2_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x2_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x2_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ab_tester_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/autogain_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/autogain_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/compressor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/compressor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/compressor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/compressor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/deesser_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/deesser_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/dyna_processor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/dyna_processor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/dyna_processor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/dyna_processor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/expander_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/expander_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/expander_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/expander_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gate_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gate_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gate_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gate_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gott_compressor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gott_compressor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gott_compressor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/gott_compressor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/graph_equalizer_x32_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/limiter_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/limiter_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/matcher_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/matcher_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_compressor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_compressor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_compressor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_compressor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_dyna_processor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_dyna_processor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_dyna_processor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_dyna_processor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_expander_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_expander_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_expander_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_expander_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_gate_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_gate_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_gate_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_gate_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_limiter_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_limiter_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_ringmod_sc_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mb_ringmod_sc_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x4_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/mixer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x16_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x32_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/para_equalizer_x8_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/return_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/return_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ringmod_sc_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/ringmod_sc_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_autogain_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_autogain_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_compressor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_compressor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_compressor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_compressor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_deesser_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_deesser_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_dyna_processor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_dyna_processor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_dyna_processor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_dyna_processor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_expander_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_expander_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_expander_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_expander_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gate_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gate_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gate_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gate_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gott_compressor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gott_compressor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gott_compressor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_gott_compressor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_limiter_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_limiter_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_matcher_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_matcher_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_compressor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_compressor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_compressor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_compressor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_dyna_processor_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_dyna_processor_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_dyna_processor_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_dyna_processor_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_expander_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_expander_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_expander_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_expander_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_gate_lr - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_gate_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_gate_ms - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_gate_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_limiter_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/sc_mb_limiter_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/send_mono - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/send_stereo - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x1 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x12 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x12 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x12 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x12 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x12 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x12 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x16 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x2 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x4 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x4 - patch specified with unsupported type httdbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.portal.Desktop' requested by ':1.13' (uid=1000 pid=4 comm="/usr/bin/reaper -newinst -nosplash")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.impl.portal.PermissionStore' requested by ':1.14' (uid=1000 pid=315 comm="/usr/lib/xdg-desktop-portal")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.impl.portal.PermissionStore'
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.portal.Documents' requested by ':1.14' (uid=1000 pid=315 comm="/usr/lib/xdg-desktop-portal")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.portal.Documents'
+fuse: device /dev/fuse not found. Kernel module not loaded?
+error: fuse init failed: Can't mount path /home/foxfire/.runtime/doc
+
+(/usr/lib/xdg-desktop-portal:315): xdg-desktop-portal-WARNING **: 11:05:41.594: Document portal fuse mount point unknown: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name :1.16 was not provided by any .service files
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.impl.portal.desktop.gtk' requested by ':1.14' (uid=1000 pid=315 comm="/usr/lib/xdg-desktop-portal")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.impl.portal.desktop.gtk'
+
+** (xdg-desktop-portal-gtk:334): WARNING **: 11:05:41.621: AT-SPI: Could not obtain desktop path or name
+
+
+** (xdg-desktop-portal-gtk:334): WARNING **: 11:05:41.623: atk-bridge: GetRegisteredEvents returned message with unknown signature
+
+** (xdg-desktop-portal-gtk:334): WARNING **: 11:05:41.623: atk-bridge: get_device_events_reply: unknown signature
+
+(/usr/lib/xdg-desktop-portal:315): xdg-desktop-portal-WARNING **: 11:05:41.634: Failed to connect to PipeWire: Couldn't connect to PipeWire
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.portal.Desktop'
+p://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x8 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x8 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x8 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+lv2: /usr/lib/lv2/lsp-plugins.lv2/ http://lsp-plug.in/plugins/lv2/spectrum_analyzer_x8 - patch specified with unsupported type http://lv2plug.in/ns/ext/atom#String
+error creating client
+A connection to the bus can't be made

@@ -1,0 +1,403 @@
+   Compiling unicode-ident v1.0.24
+   Compiling cfg-if v1.0.4
+   Compiling bitflags v2.11.1
+   Compiling winnow v1.0.3
+   Compiling log v0.4.29
+   Compiling itoa v1.0.18
+   Compiling linux-raw-sys v0.12.1
+   Compiling pin-project-lite v0.2.17
+   Compiling once_cell v1.21.4
+   Compiling smallvec v1.15.1
+   Compiling memchr v2.8.0
+   Compiling parking v2.2.1
+   Compiling equivalent v1.0.2
+   Compiling adler2 v2.0.1
+   Compiling futures-core v0.3.32
+   Compiling siphasher v1.0.3
+   Compiling libc v0.2.186
+   Compiling serde_core v1.0.228
+   Compiling crossbeam-utils v0.8.21
+   Compiling zmij v1.0.21
+   Compiling bitflags v1.3.2
+   Compiling rustc-hash v2.1.2
+   Compiling libloading v0.8.9
+   Compiling x11rb-protocol v0.13.2
+   Compiling proc-macro2 v1.0.106
+   Compiling indexmap v2.14.0
+   Compiling as-raw-xcb-connection v1.0.1
+   Compiling xcursor v0.3.10
+   Compiling toml_writer v1.1.1+spec-1.1.0
+   Compiling futures-io v0.3.32
+   Compiling fastrand v2.4.1
+   Compiling scopeguard v1.2.0
+   Compiling rustix v1.1.4
+   Compiling endi v1.1.1
+   Compiling miniz_oxide v0.8.9
+   Compiling memoffset v0.6.5
+   Compiling lock_api v0.4.14
+   Compiling crc32fast v1.5.0
+   Compiling phf_shared v0.13.1
+   Compiling clang-sys v1.8.1
+   Compiling filetime v0.2.29
+   Compiling serde_spanned v1.1.1
+   Compiling slab v0.4.12
+   Compiling raw-window-handle v0.5.2
+   Compiling futures-lite v2.6.1
+   Compiling serde_json v1.0.149
+   Compiling concurrent-queue v2.5.0
+   Compiling phf_generator v0.13.1
+   Compiling jack-sys v0.5.1
+   Compiling utf8parse v0.2.2
+   Compiling async-task v4.7.1
+   Compiling dtoa v1.0.11
+   Compiling quote v1.0.45
+   Compiling phf_codegen v0.13.1
+   Compiling anstyle-parse v1.0.0
+   Compiling atomic-waker v1.1.2
+   Compiling dtoa-short v0.3.5
+   Compiling time-core v0.1.8
+   Compiling syn v2.0.117
+   Compiling event-listener v5.4.1
+   Compiling syn v1.0.109
+   Compiling colorchoice v1.0.5
+   Compiling flate2 v1.1.9
+   Compiling powerfmt v0.2.0
+   Compiling anstyle v1.0.14
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling anstyle-query v1.1.5
+   Compiling num-conv v0.2.1
+   Compiling piper v0.2.5
+   Compiling selectors v0.37.0
+   Compiling anyhow v1.0.102
+   Compiling crossbeam-epoch v0.9.18
+   Compiling tracing-core v0.1.36
+   Compiling event-listener-strategy v0.5.4
+   Compiling time-macros v0.2.27
+   Compiling anstream v1.0.0
+   Compiling deranged v0.5.8
+   Compiling toml_parser v1.1.2+spec-1.1.0
+   Compiling keyboard-types v0.7.0
+   Compiling async-channel v2.5.0
+   Compiling async-lock v3.4.2
+   Compiling libloading v0.7.4
+   Compiling strsim v0.11.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling parking_lot_core v0.9.12
+   Compiling errno v0.3.14
+   Compiling nix v0.22.3
+   Compiling alsa-sys v0.4.0
+   Compiling parking_lot v0.12.5
+   Compiling signal-hook-registry v1.4.8
+   Compiling clap_lex v1.1.0
+   Compiling toml_edit v0.25.11+spec-1.1.0
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling vizia_id v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_id)
+   Compiling gimli v0.32.3
+   Compiling lazy_static v1.5.0
+   Compiling num_threads v0.1.7
+   Compiling jack v0.13.5
+   Compiling gl_generator v0.14.0
+   Compiling servo_arc v0.4.3
+   Compiling x11-dl v2.21.0
+   Compiling uuid v1.23.1
+   Compiling blocking v1.6.2
+   Compiling async-executor v1.14.0
+   Compiling atty v0.2.14
+   Compiling async-broadcast v0.7.2
+   Compiling crossbeam-deque v0.8.6
+   Compiling object v0.37.3
+   Compiling crossbeam-queue v0.3.12
+   Compiling crossbeam-channel v0.5.15
+   Compiling ordered-stream v0.2.0
+   Compiling alsa v0.11.0
+   Compiling type-map v0.5.1
+   Compiling proc-macro-crate v3.5.0
+   Compiling time v0.3.47
+   Compiling keyboard-types v0.6.2
+   Compiling xattr v1.6.1
+   Compiling allocator-api2 v0.2.21
+   Compiling tar v0.4.45
+   Compiling byteorder v1.5.0
+   Compiling atomic_refcell v0.1.14
+   Compiling percent-encoding v2.3.2
+   Compiling new_debug_unreachable v1.0.6
+   Compiling base64 v0.22.1
+   Compiling midi-consts v0.1.0
+   Compiling hex v0.4.3
+   Compiling foldhash v0.2.0
+   Compiling precomputed-hash v0.1.1
+   Compiling dasp_sample v0.11.0
+   Compiling termcolor v1.4.1
+   Compiling atomic_float v1.1.0
+   Compiling rustc-demangle v0.1.27
+   Compiling hashbrown v0.17.1
+   Compiling fxhash v0.2.1
+   Compiling crossbeam v0.8.4
+   Compiling gl v0.14.0
+   Compiling num-traits v0.2.19
+   Compiling vizia_input v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_input)
+   Compiling morphorm v0.8.0 (https://github.com/vizia/morphorm.git?rev=e7e5fe35e5f184500d3030287f948a4f4c7f57ae#e7e5fe35)
+   Compiling vst3-com-macros-support v0.2.0 (https://github.com/robbert-vdh/vst3-sys.git?branch=fix%2Fdrop-box-from-raw#b3ff4d77)
+   Compiling futures-channel v0.3.32
+   Compiling widestring v1.2.1
+   Compiling cpal v0.17.3
+   Compiling midir v0.11.0
+   Compiling self_cell v1.2.2
+   Compiling anymap3 v1.0.1
+   Compiling nih_log v0.3.1
+   Compiling clap-sys v0.5.0 (https://github.com/micahrj/clap-sys.git?rev=25d7f53fdb6363ad63fbd80049cb7a42a97ac156#25d7f53f)
+   Compiling rtrb v0.3.4
+   Compiling iana-time-zone v0.1.65
+   Compiling chrono v0.4.44
+   Compiling vizia_window v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_window)
+   Compiling x11 v2.21.0
+   Compiling accesskit v0.24.0
+   Compiling vizia_storage v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_storage)
+   Compiling vizia_reactive v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_reactive)
+   Compiling prettyplease v0.2.37
+   Compiling addr2line v0.25.1
+   Compiling unicode-segmentation v1.13.2
+   Compiling sys-locale v0.3.2
+   Compiling unicode-bidi v0.3.18
+   Compiling foxplugs-dsp v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-dsp)
+   Compiling camino v1.2.2
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling cargo-platform v0.3.3
+   Compiling semver v1.0.28
+   Compiling plain v0.2.3
+   Compiling reflink v0.1.3 (https://github.com/nicokoch/reflink.git?rev=e8d93b465f5d9ad340cd052b64bbc77b8ee107e2#e8d93b46)
+   Compiling bindgen v0.72.1
+   Compiling vst3-com-macros v0.2.0 (https://github.com/robbert-vdh/vst3-sys.git?branch=fix%2Fdrop-box-from-raw#b3ff4d77)
+   Compiling nih_plug_derive v0.1.0 (https://github.com/BillyDM/nih-plug.git#25d5e0a0)
+   Compiling serde_derive v1.0.228
+   Compiling displaydoc v0.2.5
+   Compiling enumflags2_derive v0.7.12
+   Compiling thiserror-impl v2.0.18
+   Compiling phf_macros v0.13.1
+   Compiling cssparser-macros v0.6.1
+   Compiling tracing-attributes v0.1.31
+   Compiling derive_more-impl v2.1.1
+   Compiling vst3-com v0.1.0 (https://github.com/robbert-vdh/vst3-sys.git?branch=fix%2Fdrop-box-from-raw#b3ff4d77)
+   Compiling serde_repr v0.1.20
+   Compiling skia-svg-macros v0.1.0
+   Compiling async-trait v0.1.89
+   Compiling clap_derive v4.6.1
+   Compiling async-recursion v1.1.1
+   Compiling vst3-sys v0.1.0 (https://github.com/robbert-vdh/vst3-sys.git?branch=fix%2Fdrop-box-from-raw#b3ff4d77)
+   Compiling scroll_derive v0.13.1
+   Compiling backtrace v0.3.76
+   Compiling tinystr v0.8.3
+   Compiling phf v0.13.1
+   Compiling unic-langid-impl v0.9.6
+   Compiling cssparser v0.36.0
+   Compiling derive_more v2.1.1
+   Compiling scroll v0.13.0
+   Compiling tracing v0.1.44
+   Compiling unic-langid-macros-impl v0.9.6
+   Compiling thiserror v2.0.18
+   Compiling gethostname v1.1.0
+   Compiling polling v3.11.0
+   Compiling terminal_size v0.4.4
+   Compiling fluent-syntax v0.12.0
+   Compiling x11rb v0.13.2
+   Compiling clap_builder v4.6.0
+   Compiling goblin v0.10.5
+   Compiling async-io v2.6.0
+   Compiling unic-langid-macros v0.9.6
+   Compiling unic-langid v0.9.6
+   Compiling cssparser-color v0.4.0
+   Compiling fluent-langneg v0.13.1
+   Compiling intl_pluralrules v7.0.2
+   Compiling intl-memoizer v0.5.3
+   Compiling async-signal v0.2.14
+   Compiling async-process v2.5.0
+   Compiling fluent-bundle v0.16.0
+   Compiling serde v1.0.228
+   Compiling baseview v0.1.1
+   Compiling x11-clipboard v0.9.3
+   Compiling baseview v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/baseview)
+   Compiling copypasta v0.10.2
+   Compiling zvariant_utils v3.3.1
+   Compiling enumflags2 v0.7.12
+   Compiling nih_plug_core v0.1.1 (https://github.com/BillyDM/nih-plug.git#25d5e0a0)
+   Compiling cargo_metadata v0.23.1
+   Compiling clap v4.6.1
+   Compiling zvariant_derive v5.11.0
+   Compiling nih_plug v0.1.0 (https://github.com/BillyDM/nih-plug.git#25d5e0a0)
+   Compiling skia-bindings v0.97.0
+   Compiling zvariant v5.11.0
+   Compiling nih_plug_xtask v0.1.0 (https://github.com/BillyDM/nih-plug.git#25d5e0a0)
+   Compiling foxplugs-plugin v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-plugin)
+   Compiling xtask v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/xtask)
+   Compiling zbus_names v4.3.2
+   Compiling zbus_macros v5.15.0
+   Compiling zbus v5.15.0
+   Compiling skia-safe v0.97.0
+   Compiling vizia_style v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_style)
+   Compiling mundy v0.2.3
+   Compiling vizia_core v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_core)
+   Compiling vizia_baseview v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_baseview)
+   Compiling vizia v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia)
+   Compiling vizia_plug v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia-plug)
+warning: unused variable: `width`
+   --> vendor/vizia-plug/src/widgets.rs:151:22
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                      ^^^^^ help: if this is intentional, prefix it with an underscore: `_width`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `height`
+   --> vendor/vizia-plug/src/widgets.rs:151:29
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_height`
+
+warning: unused variable: `cx`
+   --> vendor/vizia-plug/src/widgets.rs:146:25
+    |
+146 |     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    |                         ^^ help: if this is intentional, prefix it with an underscore: `_cx`
+
+warning: fields `context` and `last_inner_window_size` are never read
+   --> vendor/vizia-plug/src/widgets.rs:119:9
+    |
+118 | pub(crate) struct WindowModel {
+    |                   ----------- fields in this struct
+119 |     pub context: Arc<dyn GuiContext>,
+    |         ^^^^^^^
+...
+124 |     pub last_inner_window_size: AtomicCell<(u32, u32)>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `vizia_plug` (lib) generated 4 warnings (run `cargo fix --lib -p vizia_plug` to apply 3 suggestions)
+   Compiling foxplugs-ui v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-ui)
+   Compiling foxshaper v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxshaper)
+   Compiling foxcrush v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxcrush)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.30s
+     Running unittests src/lib.rs (target/debug/deps/foxcrush-162713e937ad91d1)
+
+running 16 tests
+test dsp::tests::downsample_greater_than_one_holds_between_captures ... ok
+test dsp::tests::continuous_bit_depth_values_are_preserved ... ok
+test dsp::tests::fractional_downsample_uses_fractional_phase ... ok
+test dsp::tests::pure_quantizer_has_expected_zero_deadband ... ok
+test dsp::tests::downsample_one_captures_every_sample ... ok
+test dsp::tests::reset_makes_next_sample_capture_immediately ... ok
+test dsp::tests::quantizes_positive_and_negative_samples_at_known_bit_depth ... ok
+test dsp::tests::startup_capture_does_not_lock_phase_to_zero_crossings ... ok
+test processor::tests::extra_channels_do_not_panic_or_get_processed ... ok
+test processor::tests::mix_zero_outputs_dry_signal_with_output_gain ... ok
+test processor::tests::quantization_cache_reuses_steps_until_bit_depth_changes ... ok
+test processor::tests::reset_captures_first_frame_after_reset ... ok
+test processor::tests::stereo_processor_has_fixed_channel_count ... ok
+test dsp::tests::level_compensation_controls_boost_without_erasing_crush_shape ... ok
+test processor::tests::silence_stays_silent ... ok
+test processor::tests::low_bit_depth_level_compensation_controls_boost_but_keeps_shape_change ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/foxcrush-96607b3f1e7cd0eb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/foxplugs_dsp-2bd1561894b90bb1)
+
+running 4 tests
+test tests::dry_wet_clamps_mix ... ok
+test tests::skewed_triangle_places_peak_at_shape_position ... ok
+test tests::lfo_advance_uses_sample_rate ... ok
+test tests::lfo_phase_wraps_forward_and_backward ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/foxplugs_plugin-a9383457cc0c0597)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/foxplugs_ui-f975a1758b014bc2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/foxshaper-35f13e50f87fa89c)
+
+running 26 tests
+test curve::tests::curve_state_persists_through_persistent_field_trait ... ok
+test curve::tests::default_volume_curve_starts_ducked_and_recovers ... ok
+test curve::tests::curve_state_stores_inserts_moves_and_removes_points ... ok
+test curve::tests::empty_and_single_point_curves_are_safe ... ok
+test curve::tests::hard_points_interpolate_linearly_and_wrap ... ok
+test processor::tests::audio_trigger_detector_fires_on_threshold_crossing_with_cooldown ... ok
+test curve::tests::soft_point_eases_toward_target ... ok
+test processor::tests::audio_trigger_detector_resets_state ... ok
+test processor::tests::depth_zero_outputs_dry_signal ... ok
+test processor::tests::evaluates_shape_presets_at_known_phases ... ok
+test processor::tests::extra_channels_do_not_get_processed ... ok
+test processor::tests::full_depth_at_curve_bottom_mutes_wet_signal ... ok
+test processor::tests::midi_notes_map_to_trigger_and_wave_slots ... ok
+test processor::tests::mix_blends_between_dry_and_shaped_signal ... ok
+test processor::tests::one_shot_holds_end_marker_until_triggered ... ok
+test processor::tests::phase_advances_per_processed_frame ... ok
+test processor::tests::process_frame_at_phase_does_not_advance_free_running_phase ... ok
+test processor::tests::processor_has_stereo_channel_count ... ok
+test processor::tests::processor_tracks_active_midi_wave_slot ... ok
+test processor::tests::reset_restarts_shape_phase_and_gain_smoothing ... ok
+test processor::tests::smoothing_moves_toward_gain_target_after_first_frame ... ok
+test processor::tests::sync_phase_uses_absolute_beat_position ... ok
+test processor::tests::sync_timing_converts_musical_lengths_to_beats_and_hz ... ok
+test processor::tests::trigger_restarts_phase_for_midi_triggering ... ok
+test processor::tests::trim_and_output_gain_scale_after_mix ... ok
+test processor::tests::volume_curve_mapping_matches_volume_shaper_anchor_points ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/foxshaper-3e0e78e4b0dcc48b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/xtask-8a835fc1d70534b6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests foxcrush
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests foxplugs_dsp
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests foxplugs_plugin
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests foxplugs_ui
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests foxshaper
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

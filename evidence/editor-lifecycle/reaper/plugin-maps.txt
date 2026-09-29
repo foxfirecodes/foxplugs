@@ -1,0 +1,4 @@
+7f21a8600000-7f21a937f000 r--p 00000000 00:22 22798781                   /home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper.vst3/Contents/x86_64-linux/foxshaper.so
+7f21a937f000-7f21a9d76000 r-xp 00d7e000 00:22 22798781                   /home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper.vst3/Contents/x86_64-linux/foxshaper.so
+7f21a9d76000-7f21a9dbd000 r--p 01774000 00:22 22798781                   /home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper.vst3/Contents/x86_64-linux/foxshaper.so
+7f21a9dbd000-7f21a9dc5000 rw-p 017ba000 00:22 22798781                   /home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper.vst3/Contents/x86_64-linux/foxshaper.so

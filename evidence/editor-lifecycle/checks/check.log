@@ -1,0 +1,39 @@
+   Compiling zvariant v5.11.0
+   Compiling skia-bindings v0.97.0
+    Checking nih_plug v0.1.0 (https://github.com/BillyDM/nih-plug.git#25d5e0a0)
+    Checking nih_plug_xtask v0.1.0 (https://github.com/BillyDM/nih-plug.git#25d5e0a0)
+    Checking xtask v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/xtask)
+    Checking foxplugs-plugin v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-plugin)
+    Checking zbus_names v4.3.2
+   Compiling zbus_macros v5.15.0
+    Checking skia-safe v0.97.0
+    Checking zbus v5.15.0
+    Checking vizia_style v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_style)
+    Checking mundy v0.2.3
+    Checking vizia_core v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_core)
+    Checking vizia_baseview v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_baseview)
+error[E0425]: cannot find type `Scope` in this scope
+  --> vendor/vizia/crates/vizia_baseview/src/window.rs:28:28
+   |
+28 | struct UiLifetime { scope: Scope }
+   |                            ^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 1 + use std::thread::Scope;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Scope`
+  --> vendor/vizia/crates/vizia_baseview/src/window.rs:32:23
+   |
+32 |         Self { scope: Scope::new() }
+   |                       ^^^^^ use of undeclared type `Scope`
+   |
+help: consider importing this struct
+   |
+ 1 + use std::thread::Scope;
+   |
+
+Some errors have detailed explanations: E0425, E0433.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `vizia_baseview` (lib) due to 2 previous errors

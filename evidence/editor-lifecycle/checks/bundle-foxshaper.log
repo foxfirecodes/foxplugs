@@ -1,0 +1,42 @@
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running `target/release/xtask bundle foxshaper --release --locked --offline`
+warning: unused variable: `width`
+   --> vendor/vizia-plug/src/widgets.rs:151:22
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                      ^^^^^ help: if this is intentional, prefix it with an underscore: `_width`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `height`
+   --> vendor/vizia-plug/src/widgets.rs:151:29
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_height`
+
+warning: unused variable: `cx`
+   --> vendor/vizia-plug/src/widgets.rs:146:25
+    |
+146 |     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    |                         ^^ help: if this is intentional, prefix it with an underscore: `_cx`
+
+warning: fields `context` and `last_inner_window_size` are never read
+   --> vendor/vizia-plug/src/widgets.rs:119:9
+    |
+118 | pub(crate) struct WindowModel {
+    |                   ----------- fields in this struct
+119 |     pub context: Arc<dyn GuiContext>,
+    |         ^^^^^^^
+...
+124 |     pub last_inner_window_size: AtomicCell<(u32, u32)>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `vizia_plug` (lib) generated 4 warnings (run `cargo fix --lib -p vizia_plug` to apply 3 suggestions)
+   Compiling foxshaper v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxshaper)
+    Finished `release` profile [optimized] target(s) in 6.94s
+
+Created a standalone bundle at '/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper'
+Created a CLAP bundle at '/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper.clap'
+Created a VST3 bundle at '/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper.vst3'

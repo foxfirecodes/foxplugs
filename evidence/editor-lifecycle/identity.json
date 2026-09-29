@@ -1,0 +1,28 @@
+{
+  "git_head": "9da9010ebb4a40f20362f88fd0f357fdd103f012",
+  "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11)",
+  "artifacts": [
+    {
+      "path": "/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxcrush.vst3/Contents/x86_64-linux/foxcrush.so",
+      "sha256": "fa69d2d5afe41a6ea5a6de58dac69cc03136088090288a9af80c8e9319848c37"
+    },
+    {
+      "path": "/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxcrush.vst3.tar.gz",
+      "sha256": "cb7bca2de669f76481d7cb7977bca3c20431ed694f6f026a63d29751a735e60c"
+    },
+    {
+      "path": "/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/target/bundled/foxshaper.vst3/Contents/x86_64-linux/foxshaper.so",
+      "sha256": "c959e127584170d0a2eadb2a4419e410e6c9d1b2c737500b654d3dd36591b35c"
+    },
+    {
+      "path": "/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/Cargo.lock",
+      "sha256": "b025aca465e6ee4b55b8d2e1d47b880a846565e0ce6ce9765157925389057345"
+    }
+  ],
+  "installed_foxcrush_unchanged_sha256": "51a37abf06d53a885861d3320d1a43861408d6cec5704ec265cd14d74b212c08",
+  "skia_build_archive_sha256": "6cae3099ccd85a40617f1d32afc91d1a04d7859e3ecc95a05c4f2740b217497d",
+  "foxdaw_source": "/home/foxfire/.paseo/worktrees/2qqzg1we/drunk-wolverine",
+  "display": ":1",
+  "gui_backend": "X11/Xvfb/xfwm4/software GL",
+  "installation_modified": false
+}

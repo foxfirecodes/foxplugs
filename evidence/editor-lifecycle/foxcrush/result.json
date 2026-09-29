@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "timeout": false,
+  "command": [
+    "target/gui-check/debug/foxplugs-editor-check",
+    "target/release/libfoxcrush.so",
+    "/tmp/foxplugs-editor-fix/commands"
+  ],
+  "display": ":1",
+  "timeout_seconds": 900,
+  "isolation": "read-only root/checkout; disposable home; private PID namespace, session bus and GTK portal; no network",
+  "software_gl": true,
+  "wayland_socket": null,
+  "gpu_render_node": null
+}

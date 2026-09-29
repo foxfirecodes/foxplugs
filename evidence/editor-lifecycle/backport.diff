@@ -1,0 +1,810 @@
+--- a/vizia/crates/vizia_baseview/Cargo.toml
++++ b/vizia/crates/vizia_baseview/Cargo.toml
+@@ -10,6 +10,7 @@
+ 
+ [dependencies]
+ vizia_core.workspace = true
++vizia_reactive.workspace = true
+ vizia_input.workspace = true
+ vizia_id.workspace = true
+ 
+--- a/vizia/crates/vizia_baseview/src/application.rs
++++ b/vizia/crates/vizia_baseview/src/application.rs
+@@ -7,7 +7,7 @@
+ use skia_safe::gpu::gl::FramebufferInfo;
+ use vizia_core::events::EventManager;
+ 
+-use crate::proxy::queue_get;
++use crate::proxy::BaseviewProxy;
+ use vizia_core::backend::*;
+ use vizia_core::prelude::*;
+ 
+@@ -153,6 +153,7 @@
+ 
+ pub(crate) struct ApplicationRunner {
+     cx: BackendContext,
++    proxy: BaseviewProxy,
+     event_manager: EventManager,
+     pub gr_context: skia_safe::gpu::DirectContext,
+     should_redraw: bool,
+@@ -193,6 +194,7 @@
+     #[allow(clippy::too_many_arguments)]
+     pub fn new(
+         cx: BackendContext,
++        proxy: BaseviewProxy,
+         gr_context: skia_safe::gpu::DirectContext,
+         use_system_scaling: bool,
+         window_scale_factor: f64,
+@@ -210,6 +212,7 @@
+             //current_user_scale_factor: cx.user_scale_factor(),
+             //current_window_size: *cx.window_size(),
+             cx,
++            proxy,
+             surface,
+             dirty_surface,
+             window_description,
+@@ -286,7 +289,7 @@
+         // is the analogue of the `drain_pending_work` call in `vizia_winit`'s frame loop.
+         Runtime::drain_pending_work();
+ 
+-        while let Some(event) = queue_get() {
++        while let Some(event) = self.proxy.pop() {
+             self.cx.send_event(event);
+         }
+ 
+@@ -615,6 +618,11 @@
+                     );
+ 
+                     self.cx.needs_refresh(Entity::root());
++                }
++                baseview::WindowEvent::RedrawRequested => {
++                    // Expose/remap invalidates the native back buffer even if no model changed.
++                    self.cx.needs_refresh(Entity::root());
++                    self.should_redraw = true;
+                 }
+                 baseview::WindowEvent::WillClose => {
+                     self.cx.send_event(Event::new(WindowEvent::WindowClose));
+--- a/vizia/crates/vizia_baseview/src/proxy.rs
++++ b/vizia/crates/vizia_baseview/src/proxy.rs
+@@ -1,27 +1,22 @@
+ use std::collections::VecDeque;
+-use std::sync::{LazyLock, Mutex};
++use std::sync::{Arc, Mutex};
+ use vizia_core::context::EventProxy;
+ use vizia_core::events::Event;
+ 
+-pub(crate) static PROXY_QUEUE: LazyLock<Mutex<VecDeque<Event>>> = LazyLock::new(Mutex::default);
++#[derive(Clone, Default)]
++pub(crate) struct BaseviewProxy(Arc<Mutex<VecDeque<Event>>>);
+ 
+-pub(crate) fn queue_put(event: Event) {
+-    PROXY_QUEUE.lock().unwrap().push_back(event)
++impl BaseviewProxy {
++    pub(crate) fn pop(&self) -> Option<Event> {
++        self.0.lock().unwrap().pop_front()
++    }
+ }
+-
+-pub(crate) fn queue_get() -> Option<Event> {
+-    PROXY_QUEUE.lock().unwrap().pop_front()
+-}
+-
+-#[derive(Clone)]
+-pub(crate) struct BaseviewProxy;
+ 
+ impl EventProxy for BaseviewProxy {
+     fn send(&self, event: Event) -> Result<(), ()> {
+-        queue_put(event);
++        self.0.lock().unwrap().push_back(event);
+         Ok(())
+     }
+-
+     fn make_clone(&self) -> Box<dyn EventProxy> {
+         Box::new(self.clone())
+     }
+--- a/vizia/crates/vizia_baseview/src/window.rs
++++ b/vizia/crates/vizia_baseview/src/window.rs
+@@ -11,6 +11,7 @@
+     self, ContextOptions, SurfaceOrigin, backend_render_targets, ganesh::context_options,
+ };
+ use skia_safe::{ColorSpace, ColorType, PixelGeometry, Surface, SurfaceProps, SurfacePropsFlags};
++use vizia_reactive::Scope;
+ 
+ use crate::proxy::BaseviewProxy;
+ use vizia_core::backend::*;
+@@ -21,6 +22,24 @@
+     application: ApplicationRunner,
+     #[allow(clippy::type_complexity)]
+     on_idle: Option<Box<dyn Fn(&mut Context) + Send>>,
++    // Declared last: dispose after Context/views and idle captures are dropped.
++    lifetime: UiLifetime,
++}
++
++struct UiLifetime {
++    scope: Scope,
++}
++impl UiLifetime {
++    fn new() -> Self {
++        Runtime::init_on_ui_thread();
++        Self { scope: Scope::new() }
++    }
++}
++impl Drop for UiLifetime {
++    fn drop(&mut self) {
++        self.scope.dispose();
++        Runtime::deinit_on_ui_thread();
++    }
+ }
+ 
+ impl ViziaWindow {
+@@ -32,15 +51,9 @@
+         builder: Option<Box<dyn FnOnce(&mut Context) + Send>>,
+         on_idle: Option<Box<dyn Fn(&mut Context) + Send>>,
+         is_parented: bool,
++        lifetime: UiLifetime,
++        proxy: BaseviewProxy,
+     ) -> ViziaWindow {
+-        // Reactive runtime setup — mirrors what `vizia_winit::Application::new` does.
+-        //
+-        // Mark this thread as the UI thread so off-thread `SyncSignal` writes correctly
+-        // enqueue effects via `SYNC_RUNTIME` instead of the thread-local `RUNTIME` (which
+-        // nobody drains). `on_frame_update` later calls `Runtime::drain_pending_work` to
+-        // apply those effects on this thread.
+-        Runtime::init_on_ui_thread();
+-
+         // Register a no-op sync waker. baseview doesn't expose a proxy-event primitive we
+         // can use to wake the event loop from another thread, but it drives `on_frame` at
+         // the host compositor's vsync rate anyway — signal changes from off-UI writes will
+@@ -123,6 +136,7 @@
+ 
+         let application = ApplicationRunner::new(
+             cx,
++            proxy,
+             gr_context,
+             use_system_scaling,
+             window_scale_factor,
+@@ -133,7 +147,7 @@
+         );
+         unsafe { context.make_not_current() };
+ 
+-        ViziaWindow { application, on_idle }
++        ViziaWindow { application, on_idle, lifetime }
+     }
+ 
+     /// Open a new child window.
+@@ -169,23 +183,30 @@
+             parent,
+             window_settings,
+             move |window: &mut baseview::Window<'_>| -> ViziaWindow {
+-                let mut cx = Context::new();
+-
+-                cx.ignore_default_theme = ignore_default_theme;
+-                cx.add_built_in_styles();
+-
+-                let mut cx = BackendContext::new(cx);
+-
+-                cx.set_event_proxy(Box::new(BaseviewProxy));
+-                ViziaWindow::new(
+-                    cx,
+-                    win_desc,
+-                    scale_policy,
+-                    window,
+-                    Some(Box::new(app)),
+-                    on_idle,
+-                    true, // is_parented
+-                )
++                let lifetime = UiLifetime::new();
++                let scope = lifetime.scope;
++                scope.enter(|| {
++                    let mut cx = Context::new();
++
++                    cx.ignore_default_theme = ignore_default_theme;
++                    cx.add_built_in_styles();
++
++                    let mut cx = BackendContext::new(cx);
++
++                    let proxy = BaseviewProxy::default();
++                    cx.set_event_proxy(Box::new(proxy.clone()));
++                    ViziaWindow::new(
++                        cx,
++                        win_desc,
++                        scale_policy,
++                        window,
++                        Some(Box::new(app)),
++                        on_idle,
++                        true, // is_parented
++                        lifetime,
++                        proxy,
++                    )
++                })
+             },
+         )
+     }
+@@ -216,23 +237,30 @@
+         Window::open_blocking(
+             window_settings,
+             move |window: &mut baseview::Window<'_>| -> ViziaWindow {
+-                let mut cx = Context::new();
+-
+-                cx.ignore_default_theme = ignore_default_theme;
+-                cx.add_built_in_styles();
+-
+-                let mut cx = BackendContext::new(cx);
+-
+-                cx.set_event_proxy(Box::new(BaseviewProxy));
+-                ViziaWindow::new(
+-                    cx,
+-                    win_desc,
+-                    scale_policy,
+-                    window,
+-                    Some(Box::new(app)),
+-                    on_idle,
+-                    false, // is_parented
+-                )
++                let lifetime = UiLifetime::new();
++                let scope = lifetime.scope;
++                scope.enter(|| {
++                    let mut cx = Context::new();
++
++                    cx.ignore_default_theme = ignore_default_theme;
++                    cx.add_built_in_styles();
++
++                    let mut cx = BackendContext::new(cx);
++
++                    let proxy = BaseviewProxy::default();
++                    cx.set_event_proxy(Box::new(proxy.clone()));
++                    ViziaWindow::new(
++                        cx,
++                        win_desc,
++                        scale_policy,
++                        window,
++                        Some(Box::new(app)),
++                        on_idle,
++                        false, // is_parented
++                        lifetime,
++                        proxy,
++                    )
++                })
+             },
+         )
+     }
+@@ -240,42 +268,48 @@
+ 
+ impl WindowHandler for ViziaWindow {
+     fn on_frame(&mut self, window: &mut Window) {
+-        self.application.on_frame_update(window);
+-
+-        // Run the embedder's idle callback on every frame tick, not only after
+-        // an AppKit event. Mirrors what `vizia_winit` does in its
+-        // `about_to_wait` handler: the idle callback is the documented hook
+-        // for embedders to drain work queued from off-UI threads (e.g. a
+-        // plugin host delivering keys on the host thread), and invoking it
+-        // only from `on_event` means such work can stall indefinitely when
+-        // AppKit events are sparse — observed in a macOS VST3 host where
+-        // keystrokes queued from `IPlugView::onKeyDown` only drained when
+-        // the next mouse move or key event happened to arrive.
+-        self.application.handle_idle(&self.on_idle);
+-
+-        self.application.render(window);
++        let scope = self.lifetime.scope;
++        scope.enter(|| {
++            self.application.on_frame_update(window);
++
++            // Run the embedder's idle callback on every frame tick, not only after
++            // an AppKit event. Mirrors what `vizia_winit` does in its
++            // `about_to_wait` handler: the idle callback is the documented hook
++            // for embedders to drain work queued from off-UI threads (e.g. a
++            // plugin host delivering keys on the host thread), and invoking it
++            // only from `on_event` means such work can stall indefinitely when
++            // AppKit events are sparse — observed in a macOS VST3 host where
++            // keystrokes queued from `IPlugView::onKeyDown` only drained when
++            // the next mouse move or key event happened to arrive.
++            self.application.handle_idle(&self.on_idle);
++
++            self.application.render(window);
++        });
+     }
+ 
+     fn on_event(&mut self, window: &mut Window<'_>, event: Event) -> EventStatus {
+-        let mut should_quit = false;
+-
+-        // If a text input currently holds focus, a native keyboard event is
+-        // intended for the plugin. Report it as `Captured` so the backend
+-        // does not forward the platform event further — otherwise the host
+-        // (e.g. a DAW) also processes the same keystroke, producing double
+-        // handling and a system beep on macOS.
+-        let captured = matches!(event, Event::Keyboard(_))
+-            && self.application.focused_element() == Some("textbox");
+-
+-        self.application.handle_event(event, &mut should_quit);
+-
+-        self.application.handle_idle(&self.on_idle);
+-
+-        if should_quit {
+-            window.close();
+-        }
+-
+-        if captured { EventStatus::Captured } else { EventStatus::Ignored }
++        let scope = self.lifetime.scope;
++        scope.enter(|| {
++            let mut should_quit = false;
++
++            // If a text input currently holds focus, a native keyboard event is
++            // intended for the plugin. Report it as `Captured` so the backend
++            // does not forward the platform event further — otherwise the host
++            // (e.g. a DAW) also processes the same keystroke, producing double
++            // handling and a system beep on macOS.
++            let captured = matches!(event, Event::Keyboard(_))
++                && self.application.focused_element() == Some("textbox");
++
++            self.application.handle_event(event, &mut should_quit);
++
++            self.application.handle_idle(&self.on_idle);
++
++            if should_quit {
++                window.close();
++            }
++
++            if captured { EventStatus::Captured } else { EventStatus::Ignored }
++        })
+     }
+ }
+ 
+--- a/vizia/crates/vizia_reactive/src/id.rs
++++ b/vizia/crates/vizia_reactive/src/id.rs
+@@ -8,14 +8,29 @@
+ };
+ 
+ /// An internal id which can reference a Signal/Effect/Scope.
+-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+-pub struct Id(u64);
++#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
++pub struct Id(u64, std::thread::ThreadId);
++
++impl PartialOrd for Id {
++    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
++        Some(self.cmp(other))
++    }
++}
++impl Ord for Id {
++    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
++        self.0.cmp(&other.0)
++    }
++}
+ 
+ impl Id {
++    pub(crate) fn is_current_thread(&self) -> bool {
++        self.1 == std::thread::current().id()
++    }
++
+     /// Create a new Id that's next in order
+     pub(crate) fn next() -> Id {
+         static COUNTER: AtomicU64 = AtomicU64::new(0);
+-        Id(COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed))
++        Id(COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed), std::thread::current().id())
+     }
+ 
+     /// Try to get the Signal that links with this Id
+@@ -58,8 +73,16 @@
+     /// Dispose the relevant resources that's linking to this Id, and the all the children
+     /// and grandchildren.
+     pub(crate) fn dispose(&self) {
+-        if !Runtime::is_ui_thread() {
+-            // Bounce disposal work to the UI thread so we clean up the correct runtime.
++        if !self.is_current_thread() {
++            // Sync signals created by worker/host threads are explicitly unscoped.
++            // They have no UI runtime to drain a disposal; remove their global state here.
++            if !Runtime::is_registered_thread(self.1) {
++                if let Some(signal) = SYNC_RUNTIME.remove_signal(self) {
++                    Self::cleanup_signal(Some(signal.into()));
++                    return;
++                }
++            }
++            // Scoped resources must be disposed on their owning UI thread.
+             SYNC_RUNTIME.enqueue_disposals([*self]);
+             return;
+         }
+--- a/vizia/crates/vizia_reactive/src/runtime.rs
++++ b/vizia/crates/vizia_reactive/src/runtime.rs
+@@ -5,7 +5,7 @@
+     collections::{HashMap, HashSet},
+     rc::Rc,
+     sync::{
+-        OnceLock,
++        Mutex, OnceLock,
+         atomic::{AtomicBool, Ordering},
+     },
+     thread::{self, ThreadId},
+@@ -27,10 +27,22 @@
+ pub static RUNTIME: Runtime = Runtime::new();
+ }
+ 
+-static UI_THREAD_ID: OnceLock<ThreadId> = OnceLock::new();
++static UI_THREAD_REGISTRY: OnceLock<Mutex<HashMap<ThreadId, usize>>> = OnceLock::new();
+ #[cfg(debug_assertions)]
+-static UI_THREAD_SET_LOCATION: OnceLock<&'static std::panic::Location<'static>> = OnceLock::new();
++static UI_THREAD_SET_LOCATION: OnceLock<
++    Mutex<HashMap<ThreadId, &'static std::panic::Location<'static>>>,
++> = OnceLock::new();
+ static ENFORCE_UI_THREAD: AtomicBool = AtomicBool::new(false);
++
++fn ui_thread_registry() -> &'static Mutex<HashMap<ThreadId, usize>> {
++    UI_THREAD_REGISTRY.get_or_init(|| Mutex::new(HashMap::new()))
++}
++
++#[cfg(debug_assertions)]
++fn ui_thread_locations() -> &'static Mutex<HashMap<ThreadId, &'static std::panic::Location<'static>>>
++{
++    UI_THREAD_SET_LOCATION.get_or_init(|| Mutex::new(HashMap::new()))
++}
+ 
+ /// The internal reactive Runtime which stores all the reactive system states in a
+ /// thread local.
+@@ -69,26 +81,52 @@
+         }
+     }
+ 
+-    /// Call this once on the UI thread during initialization.
++    /// Register the current thread as a UI thread.
++    ///
++    /// Backends should call this when a UI event loop/window starts on a thread.
+     #[cfg_attr(debug_assertions, track_caller)]
+     pub fn init_on_ui_thread() {
+         let current = thread::current().id();
+-        match UI_THREAD_ID.set(current) {
+-            Ok(_) => {}
+-            Err(_) => {
+-                assert_eq!(
+-                    UI_THREAD_ID.get(),
+-                    Some(&current),
+-                    "UI thread id already set to a different thread"
+-                );
+-            }
++        {
++            let mut registry = ui_thread_registry().lock().unwrap_or_else(|e| e.into_inner());
++            *registry.entry(current).or_default() += 1;
++            ENFORCE_UI_THREAD.store(true, Ordering::Relaxed);
+         }
+         #[cfg(debug_assertions)]
+         {
+             let caller = std::panic::Location::caller();
+-            let _ = UI_THREAD_SET_LOCATION.set(caller);
+-        }
+-        ENFORCE_UI_THREAD.store(true, Ordering::Relaxed);
++            let mut locations = ui_thread_locations().lock().unwrap_or_else(|e| e.into_inner());
++            locations.entry(current).or_insert(caller);
++        }
++    }
++
++    /// Unregister the current thread as a UI thread.
++    ///
++    /// Backends should call this when a UI event loop/window stops on a thread.
++    pub fn deinit_on_ui_thread() {
++        let current = thread::current().id();
++        let mut registry = ui_thread_registry().lock().unwrap_or_else(|e| e.into_inner());
++
++        let Some(count) = registry.get_mut(&current) else {
++            return;
++        };
++        *count -= 1;
++        if *count != 0 {
++            return;
++        }
++        registry.remove(&current);
++        SYNC_RUNTIME.clear_pending_for_current_thread();
++        {
++            #[cfg(debug_assertions)]
++            {
++                let mut locations = ui_thread_locations().lock().unwrap_or_else(|e| e.into_inner());
++                locations.remove(&current);
++            }
++        }
++
++        if registry.is_empty() {
++            ENFORCE_UI_THREAD.store(false, Ordering::Relaxed);
++        }
+     }
+ 
+     #[cfg_attr(debug_assertions, track_caller)]
+@@ -98,47 +136,53 @@
+         }
+ 
+         let current = thread::current().id();
+-        match UI_THREAD_ID.get() {
+-            Some(ui_id) => {
+-                if *ui_id != current {
+-                    #[cfg(debug_assertions)]
+-                    {
+-                        let caller = std::panic::Location::caller();
+-                        let set_at = UI_THREAD_SET_LOCATION.get();
+-                        let set_info = set_at
+-                            .map(|loc| format!(" (set at {}:{})", loc.file(), loc.line()))
++        let registry = ui_thread_registry().lock().unwrap_or_else(|e| e.into_inner());
++        if !registry.contains_key(&current) {
++            #[cfg(debug_assertions)]
++            {
++                let caller = std::panic::Location::caller();
++                let locations = ui_thread_locations().lock().unwrap_or_else(|e| e.into_inner());
++                let expected = registry
++                    .keys()
++                    .map(|id| {
++                        let set_info = locations
++                            .get(id)
++                            .map(|loc| format!(" (registered at {}:{})", loc.file(), loc.line()))
+                             .unwrap_or_default();
+-                        panic!(
+-                            "Unsync runtime access from non-UI thread\n  expected UI thread: {:?}{}\n  current thread: {:?}\n  caller: {}:{}",
+-                            ui_id,
+-                            set_info,
+-                            current,
+-                            caller.file(),
+-                            caller.line(),
+-                        );
+-                    }
+-                    #[cfg(not(debug_assertions))]
+-                    {
+-                        assert_eq!(
+-                            *ui_id, current,
+-                            "Unsync runtime access from non-UI thread: expected {:?}, got {:?}",
+-                            ui_id, current
+-                        );
+-                    }
+-                }
+-            }
+-            None => {
+-                // Once enforcement is on, first access defines the UI thread.
+-                let _ = UI_THREAD_ID.set(current);
+-            }
+-        }
++                        format!("{:?}{}", id, set_info)
++                    })
++                    .collect::<Vec<_>>()
++                    .join(", ");
++                panic!(
++                    "Unsync runtime access from non-UI thread\n  expected one of UI threads: [{}]\n  current thread: {:?}\n  caller: {}:{}",
++                    expected,
++                    current,
++                    caller.file(),
++                    caller.line(),
++                );
++            }
++            #[cfg(not(debug_assertions))]
++            {
++                panic!(
++                    "Unsync runtime access from non-UI thread: current {:?} is not a registered UI thread",
++                    current
++                );
++            }
++        }
++    }
++
++    pub(crate) fn is_registered_thread(thread: ThreadId) -> bool {
++        ui_thread_registry().lock().unwrap_or_else(|e| e.into_inner()).contains_key(&thread)
+     }
+ 
+     pub fn is_ui_thread() -> bool {
+         if !ENFORCE_UI_THREAD.load(Ordering::Relaxed) {
+             true
+         } else {
+-            UI_THREAD_ID.get().map(|id| *id == thread::current().id()).unwrap_or(false)
++            ui_thread_registry()
++                .lock()
++                .unwrap_or_else(|e| e.into_inner())
++                .contains_key(&thread::current().id())
+         }
+     }
+ 
+--- a/vizia/crates/vizia_reactive/src/state.rs
++++ b/vizia/crates/vizia_reactive/src/state.rs
+@@ -188,8 +188,11 @@
+ 
+         RUNTIME.with(|r| {
+             for id in &ids {
+-                r.add_pending_effect(*id);
+-            }
++                if id.is_current_thread() {
++                    r.add_pending_effect(*id);
++                }
++            }
++            SYNC_RUNTIME.enqueue_effects(ids.iter().copied().filter(|id| !id.is_current_thread()));
+             if !r.batching.get() {
+                 r.run_pending_effects();
+             }
+--- a/vizia/crates/vizia_reactive/src/sync_runtime.rs
++++ b/vizia/crates/vizia_reactive/src/sync_runtime.rs
+@@ -91,22 +91,34 @@
+     }
+ 
+     pub(crate) fn take_pending_effects(&self) -> Vec<Id> {
+-        std::mem::take(&mut *self.pending_effects.lock())
++        take_current_thread(&mut self.pending_effects.lock())
+     }
+ 
+     pub(crate) fn take_pending_disposals(&self) -> Vec<Id> {
+-        std::mem::take(&mut *self.pending_disposals.lock())
++        take_current_thread(&mut self.pending_disposals.lock())
+     }
+ 
+     pub(crate) fn has_pending_effects(&self) -> bool {
+-        !self.pending_effects.lock().is_empty()
++        self.pending_effects.lock().iter().any(Id::is_current_thread)
+     }
+ 
+     pub(crate) fn has_pending_disposals(&self) -> bool {
+-        !self.pending_disposals.lock().is_empty()
++        self.pending_disposals.lock().iter().any(Id::is_current_thread)
++    }
++
++    pub(crate) fn clear_pending_for_current_thread(&self) {
++        self.pending_effects.lock().retain(|id| !id.is_current_thread());
++        self.pending_disposals.lock().retain(|id| !id.is_current_thread());
+     }
+ 
+     pub(crate) fn set_waker(&self, waker: impl Fn() + Send + Sync + 'static) {
+         let _ = self.waker.set(Arc::new(waker));
+     }
+ }
++
++// Other windows may be ticking faster than this one. Leave their work queued.
++fn take_current_thread(queue: &mut Vec<Id>) -> Vec<Id> {
++    let (ours, others) = std::mem::take(queue).into_iter().partition(Id::is_current_thread);
++    *queue = others;
++    ours
++}
+--- a/vizia/crates/vizia_winit/src/application.rs
++++ b/vizia/crates/vizia_winit/src/application.rs
+@@ -883,7 +883,9 @@
+         self.cx.emit_scheduled_events();
+     }
+ 
+-    fn exiting(&mut self, _event_loop: &ActiveEventLoop) {}
++    fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
++        Runtime::deinit_on_ui_thread();
++    }
+ }
+ 
+ impl WindowModifiers for Application {
+Added: vendor/vizia/crates/vizia_reactive/tests/multi_editor.rs
+--- a/vizia-plug/src/editor.rs
++++ b/vizia-plug/src/editor.rs
+@@ -81,12 +81,6 @@
+     /// display value's width.
+     pub(crate) emit_parameters_changed_event: Arc<AtomicBool>,
+ 
+-    /// Shared registry of `SyncSignal<f32>`s tracking each parameter's live value. Widgets
+-    /// subscribe via `cx.data::<ParamRegistry>()`; the editor calls `flush_all()` from the
+-    /// `parameter_value_changed` / `parameter_values_changed` hooks so the reactive graph picks
+-    /// up value changes that nih-plug reports.
+-    pub(crate) param_registry: ParamRegistry,
+-
+     /// Shared state bridging the host-thread
+     /// `on_virtual_key_from_host` callback with the GUI-thread
+     /// `on_idle` callback. See [`KeyInjectState`].
+@@ -102,7 +96,8 @@
+         let app = self.app.clone();
+         let vizia_state = self.vizia_state.clone();
+         let theming = self.theming;
+-        let param_registry = self.param_registry.clone();
++        let param_registry = ParamRegistry::new();
++        let idle_registry = param_registry.clone();
+ 
+         let (unscaled_width, unscaled_height) = vizia_state.inner_logical_size();
+         let system_scaling_factor = self.scaling_factor.load();
+@@ -167,6 +162,7 @@
+                     .compare_exchange(true, false, Ordering::AcqRel, Ordering::Relaxed)
+                     .is_ok()
+                 {
++                    idle_registry.flush_all();
+                     cx.emit_custom(
+                         Event::new(RawParamEvent::ParametersChanged)
+                             .propagate(Propagation::Subtree),
+@@ -250,22 +246,18 @@
+     }
+ 
+     fn param_value_changed(&self, _id: &str, _normalized_value: f32) {
+-        // Push the new value into the registry's signals — observers bound via `Binding::new`
+-        // wake up and rebuild. Also flag a `ParametersChanged` idle event for any widgets that
+-        // still rely on the older (pre-signal) notification path.
+-        self.param_registry.flush_all();
++        // Flush on this editor's UI thread. Host/audio callbacks never enter a reactive
++        // runtime, and a newly attached editor always gets a fresh signal registry.
+         self.emit_parameters_changed_event
+             .store(true, Ordering::Relaxed);
+     }
+ 
+     fn param_modulation_changed(&self, _id: &str, _modulation_offset: f32) {
+-        self.param_registry.flush_all();
+         self.emit_parameters_changed_event
+             .store(true, Ordering::Relaxed);
+     }
+ 
+     fn param_values_changed(&self) {
+-        self.param_registry.flush_all();
+         self.emit_parameters_changed_event
+             .store(true, Ordering::Relaxed);
+     }
+--- a/vizia-plug/src/lib.rs
++++ b/vizia-plug/src/lib.rs
+@@ -17,8 +17,6 @@
+ 
+ mod editor;
+ pub mod widgets;
+-
+-use widgets::param_registry::ParamRegistry;
+ 
+ /// Create an [`Editor`] instance using a [`vizia`][::vizia] GUI. The [`ViziaState`] passed to this
+ /// function contains the GUI's intitial size, and this is kept in sync whenever the GUI gets
+@@ -63,7 +61,6 @@
+         scaling_factor: AtomicCell::new(Some(1.0)),
+ 
+         emit_parameters_changed_event: Arc::new(AtomicBool::new(false)),
+-        param_registry: ParamRegistry::new(),
+         key_inject: editor::KeyInjectState::new(),
+     }))
+ }
+--- a/baseview/src/event.rs
++++ b/baseview/src/event.rs
+@@ -110,6 +110,8 @@
+ 
+ #[derive(Debug, Clone)]
+ pub enum WindowEvent {
++    /// Native contents were invalidated (e.g. expose or remap); repaint the window.
++    RedrawRequested,
+     Resized(WindowInfo),
+     Focused,
+     Unfocused,
+--- a/baseview/src/x11/event_loop.rs
++++ b/baseview/src/x11/event_loop.rs
+@@ -16,6 +16,7 @@
+     parent_handle: Option<ParentHandle>,
+ 
+     new_physical_size: Option<PhySize>,
++    redraw_requested: bool,
+     frame_interval: Duration,
+     event_loop_running: bool,
+ }
+@@ -32,6 +33,7 @@
+             frame_interval: Duration::from_millis(15),
+             event_loop_running: false,
+             new_physical_size: None,
++            redraw_requested: false,
+         }
+     }
+ 
+@@ -58,6 +60,12 @@
+             );
+         }
+ 
++        if std::mem::take(&mut self.redraw_requested) {
++            self.handler.on_event(
++                &mut crate::Window::new(Window { inner: &self.window }),
++                Event::Window(WindowEvent::RedrawRequested),
++            );
++        }
+         Ok(())
+     }
+ 
+@@ -159,6 +167,12 @@
+                 }
+             }
+ 
++            XEvent::Expose(event) if event.window == self.window.window_id => {
++                self.redraw_requested = true;
++            }
++            XEvent::MapNotify(event) if event.window == self.window.window_id => {
++                self.redraw_requested = true;
++            }
+             XEvent::ConfigureNotify(event) => {
+                 let new_physical_size = PhySize::new(event.width as u32, event.height as u32);
+ 
+--- a/baseview/src/x11/window.rs
++++ b/baseview/src/x11/window.rs
+@@ -97,7 +97,7 @@
+     gl_context: Option<GlContext>,
+ 
+     pub(crate) xcb_connection: XcbConnection,
+-    window_id: XWindow,
++    pub(super) window_id: XWindow,
+     pub(crate) window_info: WindowInfo,
+     visual_id: Visualid,
+     mouse_cursor: Cell<MouseCursor>,
