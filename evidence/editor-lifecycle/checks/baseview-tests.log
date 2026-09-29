@@ -1,0 +1,16 @@
+   Compiling zmij v1.0.21
+   Compiling toml v1.1.2+spec-1.1.0
+   Compiling flate2 v1.1.9
+   Compiling serde_json v1.0.149
+   Compiling skia-bindings v0.97.0
+   Compiling skia-safe v0.97.0
+   Compiling vizia_style v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_style)
+   Compiling vizia_core v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_core)
+   Compiling vizia_baseview v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_baseview)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.40s
+     Running unittests src/lib.rs (target/debug/deps/vizia_baseview-d83a59a7f7ff2637)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,24 @@
+
+xwininfo: Window id: 0xa00005 "Vizia Application"
+
+  Absolute upper-left X:  0
+  Absolute upper-left Y:  0
+  Relative upper-left X:  0
+  Relative upper-left Y:  0
+  Width: 340
+  Height: 360
+  Depth: 24
+  Visual: 0x2b7
+  Visual Class: TrueColor
+  Border width: 0
+  Class: InputOutput
+  Colormap: 0xa00004 (not installed)
+  Bit Gravity State: ForgetGravity
+  Window Gravity State: NorthWestGravity
+  Backing Store State: NotUseful
+  Save Under State: no
+  Map State: IsUnviewable
+  Override Redirect State: no
+  Corners:  +0+0  -1100+0  -1100-640  +0-640
+  -geometry 340x360+0+0
+

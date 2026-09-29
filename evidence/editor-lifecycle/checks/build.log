@@ -1,0 +1,53 @@
+   Compiling skia-bindings v0.97.0
+   Compiling vizia_id v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_id)
+   Compiling vizia_reactive v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_reactive)
+   Compiling baseview v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/baseview)
+   Compiling foxplugs-dsp v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-dsp)
+   Compiling foxplugs-plugin v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-plugin)
+   Compiling vizia_input v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_input)
+   Compiling vizia_storage v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_storage)
+   Compiling vizia_window v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_window)
+   Compiling skia-safe v0.97.0
+   Compiling vizia_style v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_style)
+   Compiling vizia_core v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_core)
+   Compiling vizia_baseview v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_baseview)
+   Compiling vizia v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia)
+   Compiling vizia_plug v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia-plug)
+warning: unused variable: `width`
+   --> vendor/vizia-plug/src/widgets.rs:151:22
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                      ^^^^^ help: if this is intentional, prefix it with an underscore: `_width`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `height`
+   --> vendor/vizia-plug/src/widgets.rs:151:29
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_height`
+
+warning: unused variable: `cx`
+   --> vendor/vizia-plug/src/widgets.rs:146:25
+    |
+146 |     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    |                         ^^ help: if this is intentional, prefix it with an underscore: `_cx`
+
+warning: fields `context` and `last_inner_window_size` are never read
+   --> vendor/vizia-plug/src/widgets.rs:119:9
+    |
+118 | pub(crate) struct WindowModel {
+    |                   ----------- fields in this struct
+119 |     pub context: Arc<dyn GuiContext>,
+    |         ^^^^^^^
+...
+124 |     pub last_inner_window_size: AtomicCell<(u32, u32)>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `vizia_plug` (lib) generated 4 warnings (run `cargo fix --lib -p vizia_plug` to apply 3 suggestions)
+   Compiling foxplugs-ui v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-ui)
+   Compiling foxcrush v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxcrush)
+   Compiling foxshaper v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxshaper)
+    Finished `release` profile [optimized] target(s) in 27.68s

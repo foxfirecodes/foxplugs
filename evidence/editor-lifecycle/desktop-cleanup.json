@@ -1,0 +1,12 @@
+[
+  {
+    "pid": 264349,
+    "kind": "xfwm4",
+    "stopped": true
+  },
+  {
+    "pid": 263805,
+    "kind": "Xvfb",
+    "stopped": true
+  }
+]

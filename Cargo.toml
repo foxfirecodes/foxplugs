@@ -1,5 +1,6 @@
 [workspace]
 resolver = "2"
+exclude = ["vendor/vizia", "vendor/vizia-plug", "vendor/baseview"]
 members = [
   "crates/foxcrush",
   "crates/foxshaper",
@@ -21,7 +22,7 @@ foxplugs-plugin = { path = "crates/foxplugs-plugin" }
 foxplugs-ui = { path = "crates/foxplugs-ui" }
 nih_plug = { git = "https://github.com/BillyDM/nih-plug.git" }
 nih_plug_xtask = { git = "https://github.com/BillyDM/nih-plug.git" }
-vizia_plug = { git = "https://github.com/vizia/vizia-plug.git" }
+vizia_plug = { git = "https://github.com/vizia/vizia-plug.git", rev = "d106863cecb020b492acf00254fb5a61d4cda55d" }
 
 [workspace.metadata]
 name = "foxplugs"
@@ -34,3 +35,13 @@ strip = "symbols"
 inherits = "release"
 debug = true
 strip = "none"
+
+# Reproducible editor-lifecycle backports; see vendor/README.md.
+[patch."https://github.com/vizia/vizia-plug.git"]
+vizia_plug = { path = "vendor/vizia-plug" }
+
+[patch."https://github.com/vizia/vizia"]
+vizia = { path = "vendor/vizia" }
+
+[patch."https://github.com/vizia/baseview.git"]
+baseview = { path = "vendor/baseview" }

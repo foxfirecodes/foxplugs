@@ -1,0 +1,92 @@
+   Compiling skia-bindings v0.97.0
+    Checking skia-safe v0.97.0
+    Checking vizia_style v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_style)
+    Checking vizia_core v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_core)
+    Checking vizia_baseview v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_baseview)
+    Checking vizia v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia)
+    Checking vizia_plug v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia-plug)
+warning: unused variable: `width`
+   --> vendor/vizia-plug/src/widgets.rs:151:22
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                      ^^^^^ help: if this is intentional, prefix it with an underscore: `_width`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `height`
+   --> vendor/vizia-plug/src/widgets.rs:151:29
+    |
+151 |                 let (width, height) = self.vizia_state.inner_logical_size();
+    |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_height`
+
+warning: unused variable: `cx`
+   --> vendor/vizia-plug/src/widgets.rs:146:25
+    |
+146 |     fn event(&mut self, cx: &mut EventContext, event: &mut Event) {
+    |                         ^^ help: if this is intentional, prefix it with an underscore: `_cx`
+
+warning: fields `context` and `last_inner_window_size` are never read
+   --> vendor/vizia-plug/src/widgets.rs:119:9
+    |
+118 | pub(crate) struct WindowModel {
+    |                   ----------- fields in this struct
+119 |     pub context: Arc<dyn GuiContext>,
+    |         ^^^^^^^
+...
+124 |     pub last_inner_window_size: AtomicCell<(u32, u32)>,
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `vizia_plug` (lib) generated 4 warnings (run `cargo clippy --fix --lib -p vizia_plug` to apply 3 suggestions)
+    Checking foxplugs-ui v0.1.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/crates/foxplugs-ui)
+error: all variants have the same postfix: `TextInput`
+  --> crates/foxplugs-ui/src/widgets/knob.rs:71:1
+   |
+71 | / pub enum ParamKnobEvent {
+72 | |     StartTextInput,
+73 | |     SubmitTextInput(String),
+74 | |     CancelTextInput,
+75 | | }
+   | |_^
+   |
+   = help: remove the postfixes and use full paths to the variants instead of glob imports
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#enum_variant_names
+   = note: `-D clippy::enum-variant-names` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::enum_variant_names)]`
+
+error: methods called `new` usually return `Self`
+   --> crates/foxplugs-ui/src/widgets/knob.rs:195:5
+    |
+195 | /     fn new(
+196 | |         cx: &mut Context,
+197 | |         param_base: ParamWidgetBase,
+198 | |         bipolar_signal: SyncSignal<bool>,
+...   |
+226 | |         .bind(bipolar_signal, |mut h| h.needs_redraw());
+227 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#new_ret_no_self
+    = note: `-D clippy::new-ret-no-self` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::new_ret_no_self)]`
+
+error: this function has too many arguments (8/7)
+   --> crates/foxplugs-ui/src/widgets/knob.rs:459:1
+    |
+459 | / fn draw_arc(
+460 | |     canvas: &Canvas,
+461 | |     cx_px: f32,
+462 | |     cy_px: f32,
+...   |
+467 | |     color: vg::Color,
+468 | | ) {
+    | |_^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.93.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: could not compile `foxplugs-ui` (lib) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `foxplugs-ui` (lib test) due to 3 previous errors

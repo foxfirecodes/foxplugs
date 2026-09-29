@@ -1,0 +1,30 @@
+   Compiling vizia_reactive v0.4.0 (/home/foxfire/.paseo/worktrees/13j33zef/parched-goose/vendor/vizia/crates/vizia_reactive)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.29s
+     Running unittests src/lib.rs (target/debug/deps/vizia_reactive-ce90a1de0aff53d0)
+
+running 7 tests
+test id::tests::disposing_scope_drops_signals_and_effects ... ok
+test id::tests::effect_disposed_when_dependency_signal_disposed ... ok
+test id::tests::set_parent_disposes_with_new_parent ... ok
+test id::tests::set_parent_removes_from_old_parent ... ok
+test id::tests::set_parent_reparents_scope ... ok
+test id::tests::signals_created_by_effect_are_disposed_with_effect ... ok
+test sync_signal::tests::set_if_changed_skips_notifications_when_value_unchanged ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/multi_editor.rs (target/debug/deps/multi_editor-26908cab554f4ba6)
+
+running 1 test
+test editor_threads_route_updates_dispose_and_recreate ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vizia_reactive
+
+running 1 test
+test vendor/vizia/crates/vizia_reactive/src/scope.rs - scope::Scope::set_parent (line 68) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.10s; merged doctests compilation took 0.10s

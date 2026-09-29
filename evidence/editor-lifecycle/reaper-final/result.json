@@ -1,0 +1,14 @@
+{
+  "exit": 0,
+  "timeout": false,
+  "command": [
+    "sh",
+    "/tmp/foxplugs-editor-fix/reaper-final.sh"
+  ],
+  "display": ":1",
+  "timeout_seconds": 300,
+  "isolation": "read-only root/checkout; disposable home; private PID namespace, session bus and GTK portal; no network",
+  "software_gl": true,
+  "wayland_socket": null,
+  "gpu_render_node": null
+}

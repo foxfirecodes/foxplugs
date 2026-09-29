@@ -1,0 +1,167 @@
+{
+  "foxcrush_instance_values": [
+    {
+      "bit_depth": {
+        "f32": 10.0
+      },
+      "downsample": {
+        "f32": 1.0
+      },
+      "mix": {
+        "f32": 1.0
+      },
+      "output_gain": {
+        "f32": 1.0
+      }
+    },
+    {
+      "bit_depth": {
+        "f32": 16.0
+      },
+      "downsample": {
+        "f32": 13.000001
+      },
+      "mix": {
+        "f32": 1.0
+      },
+      "output_gain": {
+        "f32": 1.0
+      }
+    }
+  ],
+  "foxshaper_instance_values": [
+    {
+      "audio_detail": {
+        "f32": 0.5
+      },
+      "audio_high_cut_hz": {
+        "f32": 20000.0
+      },
+      "audio_low_cut_hz": {
+        "f32": 20.0
+      },
+      "audio_sidechain": {
+        "bool": false
+      },
+      "audio_threshold": {
+        "f32": 0.25118864
+      },
+      "depth": {
+        "f32": 0.35
+      },
+      "end_marker": {
+        "f32": 1.0
+      },
+      "lfo_mode": {
+        "string": "beats"
+      },
+      "loop_mode": {
+        "string": "loop"
+      },
+      "midi_switch": {
+        "bool": false
+      },
+      "mix": {
+        "f32": 1.0
+      },
+      "output_gain": {
+        "f32": 1.0
+      },
+      "phase_offset": {
+        "f32": 0.0
+      },
+      "rate_hz": {
+        "f32": 1.0
+      },
+      "shape": {
+        "f32": 0.5
+      },
+      "shape_preset": {
+        "string": "sidechain"
+      },
+      "smooth": {
+        "f32": 0.05
+      },
+      "sync_length": {
+        "string": "1-bar"
+      },
+      "sync_rhythm": {
+        "string": "straight"
+      },
+      "trigger_mode": {
+        "string": "sync"
+      },
+      "trim": {
+        "f32": 1.0
+      }
+    },
+    {
+      "audio_detail": {
+        "f32": 0.5
+      },
+      "audio_high_cut_hz": {
+        "f32": 20000.0
+      },
+      "audio_low_cut_hz": {
+        "f32": 20.0
+      },
+      "audio_sidechain": {
+        "bool": false
+      },
+      "audio_threshold": {
+        "f32": 0.25118864
+      },
+      "depth": {
+        "f32": 1.0
+      },
+      "end_marker": {
+        "f32": 1.0
+      },
+      "lfo_mode": {
+        "string": "beats"
+      },
+      "loop_mode": {
+        "string": "loop"
+      },
+      "midi_switch": {
+        "bool": false
+      },
+      "mix": {
+        "f32": 1.0
+      },
+      "output_gain": {
+        "f32": 1.0
+      },
+      "phase_offset": {
+        "f32": 0.0
+      },
+      "rate_hz": {
+        "f32": 1.0
+      },
+      "shape": {
+        "f32": 0.78999996
+      },
+      "shape_preset": {
+        "string": "sidechain"
+      },
+      "smooth": {
+        "f32": 0.05
+      },
+      "sync_length": {
+        "string": "1-bar"
+      },
+      "sync_rhythm": {
+        "string": "straight"
+      },
+      "trigger_mode": {
+        "string": "sync"
+      },
+      "trim": {
+        "f32": 1.0
+      }
+    }
+  ],
+  "parameter_ids_preserved": true,
+  "fresh_process_and_recreation_recall": true,
+  "clean_host_exits": true
+}
